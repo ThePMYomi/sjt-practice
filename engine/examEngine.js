@@ -415,22 +415,29 @@ function showResults(score, maxScore){
     // ANALYTICS
     // =======================
 
-    const analytics = calculateAnalytics()
+const analytics = calculateAnalytics()
 
-    let analyticsHTML = "<h3>Performance by Competency</h3>"
+let analyticsHTML = "<h3>Performance by Competency</h3>"
 
-    Object.entries(analytics).forEach(([comp,data])=>{
+Object.entries(analytics).forEach(([comp,data])=>{
 
-        const percent =
-            data.max
-            ? Math.round((data.earned / data.max) * 100)
-            : 0
+    const percent =
+        data.max
+        ? Math.round((data.earned / data.max) * 100)
+        : 0
 
-        analyticsHTML += `<p>${comp}: ${percent}%</p>`
+    analyticsHTML += `
+        <div class="competency-row">
+            <div class="competency-label">${comp} (${percent}%)</div>
+            <div class="competency-bar">
+                <div class="competency-fill" style="width:${percent}%"></div>
+            </div>
+        </div>
+    `
 
-    })
+})
 
-    resultsDiv.innerHTML += analyticsHTML
+resultsDiv.innerHTML += analyticsHTML
 
 
     // review button
@@ -635,4 +642,5 @@ export function getUserAnswers() {
 
 
 }
+
 
