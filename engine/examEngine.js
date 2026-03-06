@@ -436,8 +436,6 @@ function showResults(score, maxScore){
 }
 
 
-==============
-
 
 function showReview(){
 
@@ -589,5 +587,6 @@ export function getExamQuestions() {
 export function getUserAnswers() {
 
     return userAnswers
+
 
 }
