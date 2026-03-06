@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DCT Situational Judgement Test Practice</title>
+
+<link rel="stylesheet" href="style.css">
+
+<!-- Drag-and-drop library for ranking questions -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+</head>
+
+
+
+<body>
+
+
+
+<!-- ===================== -->
+<!-- HEADER -->
+<!-- ===================== -->
+
+<header>
+
+<h1>DCT Situational Judgement Test Practice</h1>
+
+<p>Practice NHS-style SJT questions with realistic timing and scoring.</p>
+
+</header>
+
+
+
+<!-- ===================== -->
+<!-- START MENU -->
+<!-- ===================== -->
+
+<section id="startMenu">
+
+<h2>Start Practice</h2>
+
+<div class="menu-grid">
+
+
+
+<!-- Difficulty -->
+
+<div>
+
+<label for="difficulty">Difficulty</label>
+
+<select id="difficulty">
+
+<option value="all">All</option>
+<option value="easy">Easy</option>
+<option value="medium">Medium</option>
+<option value="hard">Hard</option>
+
+</select>
+
+</div>
+
+
+
+<!-- Number of Questions -->
+
+<div>
+
+<label for="questionCount">Number of Questions</label>
+
+<select id="questionCount">
+
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="30">30</option>
+<option value="40">40</option>
+<option value="50">50</option>
+<option value="60">60</option>
+
+</select>
+
+</div>
+
+
+
+<!-- Competency Filter -->
+
+<div>
+
+<label for="competency">Competency Focus</label>
+
+<select id="competency">
+
+<option value="all">All Competencies</option>
+
+<option value="patient-centred care">Patient-centred care</option>
+
+<option value="professionalism">Professionalism</option>
+
+<option value="team communication">Team communication</option>
+
+<option value="handling feedback">Handling feedback</option>
+
+<option value="coping with pressure">Coping with pressure</option>
+
+<option value="clinical safety">Clinical safety</option>
+
+<option value="ethical decision making">Ethical decision making</option>
+
+<option value="seeking supervision appropriately">
+Seeking supervision appropriately
+</option>
+
+</select>
+
+</div>
+
+
+
+</div>
+
+
+
+<button id="startBtn" class="primary-btn">
+
+Start Practice
+
+</button>
+
+
+<button id="incorrectBtn">
+Practice Incorrect Questions
+</button>
+
+
+
+</section>
+
+
+
+<!-- ===================== -->
+<!-- TIMER -->
+<!-- ===================== -->
+
+<div id="timer"></div>
+
+
+
+<!-- ===================== -->
+<!-- QUESTION NAVIGATION GRID -->
+<!-- ===================== -->
+
+<div id="navigation"></div>
+
+
+
+<!-- ===================== -->
+<!-- QUIZ AREA -->
+<!-- ===================== -->
+
+<section id="quiz"></section>
+
+
+
+<!-- ===================== -->
+<!-- QUESTION NAVIGATION BUTTONS -->
+<!-- ===================== -->
+
+<div class="nav-buttons">
+
+<button id="prevBtn">Previous</button>
+
+<button id="nextBtn">Next</button>
+
+<button id="submitBtn">Submit Exam</button>
+
+</div>
+
+
+
+<!-- ===================== -->
+<!-- RESULTS AREA -->
+<!-- ===================== -->
+
+<section id="results"></section>
+
+
+
+<!-- ===================== -->
+<!-- MAIN APP SCRIPT -->
+<!-- ===================== -->
+
+<script type="module" src="app.js"></script>
+
+
+
+</body>
+
+</html>
