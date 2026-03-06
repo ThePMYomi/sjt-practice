@@ -342,43 +342,46 @@ export function submitExam() {
     let totalScore = 0
     let maxScore = 0
 
+    incorrectQuestions = []
+
     examQuestions.forEach((q, i) => {
 
-    const userAnswer = userAnswers[i]
+        const userAnswer = userAnswers[i]
 
-    if (!userAnswer) return
+        let score = 0
 
-    let score = 0
+        if (q.type === "ranking") {
 
-    if (q.type === "ranking") {
+            maxScore += 20
 
-        score = scoreRanking(q.answer, userAnswer)
-        maxScore += 20
+            if (userAnswer) {
+                score = scoreRanking(q.answer, userAnswer)
+            }
 
-    }
+        }
 
-    if (q.type === "best3") {
+        if (q.type === "best3") {
 
-        score = scoreBest3(q.answer, userAnswer)
-        maxScore += 12
+            maxScore += 12
 
-    }
+            if (userAnswer) {
+                score = scoreBest3(q.answer, userAnswer)
+            }
 
-    totalScore += score
+        }
 
-    if(score === 0){
+        totalScore += score
 
-        incorrectQuestions.push(q)
+        if(score === 0){
+            incorrectQuestions.push(q)
+        }
 
-    }
+    })
 
-})
-
-
-localStorage.setItem(
-    "incorrectSJTQuestions",
-    JSON.stringify(incorrectQuestions)
-)
+    localStorage.setItem(
+        "incorrectSJTQuestions",
+        JSON.stringify(incorrectQuestions)
+    )
 
     showResults(totalScore, maxScore)
 
@@ -396,7 +399,6 @@ function showResults(score, maxScore){
     const percent = Math.round((score / maxScore) * 100)
 
     resultsDiv.innerHTML = `
-
         <h2>Exam Results</h2>
 
         <p><strong>Score:</strong> ${score} / ${maxScore}</p>
@@ -406,7 +408,6 @@ function showResults(score, maxScore){
         <button id="reviewBtn">Review Questions</button>
 
         <button onclick="location.reload()">Start New Practice</button>
-
     `
 
 
@@ -421,7 +422,9 @@ function showResults(score, maxScore){
     Object.entries(analytics).forEach(([comp,data])=>{
 
         const percent =
-            Math.round((data.correct/data.total)*100)
+            data.max
+            ? Math.round((data.earned / data.max) * 100)
+            : 0
 
         analyticsHTML += `<p>${comp}: ${percent}%</p>`
 
@@ -431,11 +434,53 @@ function showResults(score, maxScore){
 
 
     // review button
+
     document.getElementById("reviewBtn").onclick = showReview
 
 }
 
 
+//=================================
+
+//==================================
+
+        const userAnswer = userAnswers[i]
+
+        let earnedPoints = 0
+        let maxPoints = 0
+
+        if(q.type === "ranking"){
+
+            maxPoints = 20
+
+            if(userAnswer){
+                earnedPoints = scoreRanking(q.answer,userAnswer)
+            }
+
+        }
+
+        if(q.type === "best3"){
+
+            maxPoints = 12
+
+            if(userAnswer){
+                earnedPoints = scoreBest3(q.answer,userAnswer)
+            }
+
+        }
+
+        stats[q.competency].earned += earnedPoints
+        stats[q.competency].max += maxPoints
+
+    })
+
+    return stats
+
+}
+    
+//=========================
+// SHOW REVIEW
+//=========================
 
 function showReview(){
 
@@ -590,3 +635,4 @@ export function getUserAnswers() {
 
 
 }
+
