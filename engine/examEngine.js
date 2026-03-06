@@ -99,7 +99,7 @@ function indexQuestions() {
 // GENERATE EXAM
 // =======================
 
-export function generateExam(difficulty, numberOfQuestions) {
+export function generateExam(difficulty, numberOfQuestions, questionType) {
 
     let pool = []
 
@@ -108,7 +108,57 @@ export function generateExam(difficulty, numberOfQuestions) {
     else if (difficulty === "hard") pool = hardQuestions
     else pool = questionBank
 
-    examQuestions = shuffle(pool).slice(0, numberOfQuestions)
+
+    let rankingPool = pool.filter(q => q.type === "ranking")
+    let best3Pool = pool.filter(q => q.type === "best3")
+
+
+    if (questionType === "ranking") {
+
+        examQuestions = shuffle(rankingPool).slice(0, numberOfQuestions)
+
+    }
+
+    else if (questionType === "best3") {
+
+        examQuestions = shuffle(best3Pool).slice(0, numberOfQuestions)
+
+    }
+
+else {
+
+    // REALISTIC DISTRIBUTION
+    // 70% ranking, 30% best3
+
+    let rankingCount =
+        Math.round(numberOfQuestions * 0.7)
+
+    let best3Count =
+        numberOfQuestions - rankingCount
+
+
+    // Prevent requesting more questions than available
+
+    rankingCount = Math.min(rankingCount, rankingPool.length)
+    best3Count = Math.min(best3Count, best3Pool.length)
+
+
+    const rankingQuestions =
+        shuffle(rankingPool).slice(0, rankingCount)
+
+    const best3Questions =
+        shuffle(best3Pool).slice(0, best3Count)
+
+
+    // Ranking questions must come first
+
+    examQuestions = [
+        ...rankingQuestions,
+        ...best3Questions
+    ]
+
+}
+
 
     userAnswers = {}
 
@@ -126,11 +176,58 @@ export function generateExam(difficulty, numberOfQuestions) {
 // COMPETENCY PRACTICE
 // =======================
 
-export function generateCompetencyPractice(competency, numberOfQuestions) {
+export function generateCompetencyPractice(
+    competency,
+    numberOfQuestions,
+    questionType
+) {
 
     let pool = competencyIndex[competency] || []
 
-    examQuestions = shuffle(pool).slice(0, numberOfQuestions)
+    let rankingPool = pool.filter(q => q.type === "ranking")
+    let best3Pool = pool.filter(q => q.type === "best3")
+
+
+    if (questionType === "ranking") {
+
+        examQuestions =
+            shuffle(rankingPool).slice(0, numberOfQuestions)
+
+    }
+
+    else if (questionType === "best3") {
+
+        examQuestions =
+            shuffle(best3Pool).slice(0, numberOfQuestions)
+
+    }
+
+else {
+
+    let rankingCount =
+        Math.round(numberOfQuestions * 0.7)
+
+    let best3Count =
+        numberOfQuestions - rankingCount
+
+
+    rankingCount = Math.min(rankingCount, rankingPool.length)
+    best3Count = Math.min(best3Count, best3Pool.length)
+
+
+    const rankingQuestions =
+        shuffle(rankingPool).slice(0, rankingCount)
+
+    const best3Questions =
+        shuffle(best3Pool).slice(0, best3Count)
+
+
+    examQuestions = [
+        ...rankingQuestions,
+        ...best3Questions
+    ]
+
+}
 
     userAnswers = {}
 
@@ -210,12 +307,23 @@ export function renderCurrentQuestion() {
 
     container.innerHTML = ""
 
-    if (question.type === "ranking") {
-        renderRankingQuestion(container, question, currentQuestionIndex)
-    }
+    const header = document.createElement("div")
+    header.className = "question-header"
 
-    if (question.type === "best3") {
+    header.innerHTML =
+    `<h3>Question ${currentQuestionIndex + 1} of ${examQuestions.length}</h3>`
+
+    container.appendChild(header)
+
+    if (question.type === "ranking") {
+
+        renderRankingQuestion(container, question, currentQuestionIndex)
+
+    }
+    else if (question.type === "best3") {
+
         renderBest3Question(container, question, currentQuestionIndex)
+
     }
 
     updateNavigation(currentQuestionIndex, examQuestions.length)
@@ -531,3 +639,4 @@ export function getExamQuestions() {
 export function getUserAnswers() {
     return userAnswers
 }
+
