@@ -1,98 +1,126 @@
-let questions = [];
-let selectedQuestions = [];
-let time = 600;
+// app.js
 
-async function loadQuestions(){
- const response = await fetch("questions.csv");
- const data = await response.text();
+import {
+    loadQuestionBank,
+    generateExam,
+    generateCompetencyPractice,
+    nextQuestion,
+    previousQuestion,
+    submitExam,
+    practiceIncorrect
+} from "./engine/examEngine.js"
 
- const rows = data.split("\n").slice(1);
 
- questions = rows.map(row=>{
-  const cols = row.split(",");
-  return {
-   id: cols[0],
-   question: cols[1],
-   options: [cols[2],cols[3],cols[4],cols[5]],
-   answer: cols[6],
-   rationale: cols[7]
-  }
- });
+// =======================
+// INITIALISE APP
+// =======================
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    console.log("Loading question bank...")
+
+    await loadQuestionBank()
+
+    console.log("App ready")
+
+})
+
+
+
+// =======================
+// START EXAM
+// =======================
+
+const startBtn = document.getElementById("startBtn")
+
+startBtn.addEventListener("click", () => {
+
+    const difficulty =
+        document.getElementById("difficulty").value
+
+    const questionCount =
+        parseInt(document.getElementById("questionCount").value)
+
+    const competency =
+        document.getElementById("competency").value
+
+
+    // hide start screen
+    document.getElementById("startMenu").style.display = "none"
+
+
+    if (competency === "all") {
+
+        generateExam(difficulty, questionCount)
+
+    }
+
+    else {
+
+        generateCompetencyPractice(competency, questionCount)
+
+    }
+
+})
+
+
+
+// =======================
+// NAVIGATION BUTTONS
+// =======================
+
+const prevBtn = document.getElementById("prevBtn")
+
+prevBtn.addEventListener("click", () => {
+
+    previousQuestion()
+
+})
+
+
+
+const nextBtn = document.getElementById("nextBtn")
+
+nextBtn.addEventListener("click", () => {
+
+    nextQuestion()
+
+})
+
+
+
+// =======================
+// Incorrect Button
+// =======================
+
+const incorrectBtn = document.getElementById("incorrectBtn")
+
+incorrectBtn.onclick = () => {
+
+    document.getElementById("startMenu").style.display = "none"
+
+    practiceIncorrect()
+
 }
 
-function randomQuestions(n){
- return [...questions].sort(()=>0.5-Math.random()).slice(0,n);
-}
 
-function startQuiz(){
- selectedQuestions = randomQuestions(10);
- renderQuestions();
- startTimer();
-}
 
-function renderQuestions(){
- const quizDiv = document.getElementById("quiz");
- quizDiv.innerHTML="";
+// =======================
+// SUBMIT EXAM
+// =======================
 
- selectedQuestions.forEach((q,i)=>{
-  let html=`<div class="question">
-  <p>${i+1}. ${q.question}</p>`;
+const submitBtn = document.getElementById("submitBtn")
 
-  q.options.forEach((opt,j)=>{
-   const letter=["A","B","C","D"][j];
-   html+=`
-   <label>
-   <input type="radio" name="q${i}" value="${letter}">
-   ${opt}
-   </label><br>`;
-  });
+submitBtn.addEventListener("click", () => {
 
-  html+="</div>";
+    const confirmSubmit = confirm(
+        "Are you sure you want to submit the exam?"
+    )
 
-  quizDiv.innerHTML+=html;
- });
-}
+    if (confirmSubmit) {
 
-function startTimer(){
- const timerDiv=document.getElementById("timer");
+        submitExam()
 
- const interval=setInterval(()=>{
-  time--;
-  timerDiv.innerText="Time: "+time+"s";
+    }
 
-  if(time<=0){
-   clearInterval(interval);
-   submitQuiz();
-  }
- },1000);
-}
-
-function submitQuiz(){
-
- let score=0;
- const resultsDiv=document.getElementById("results");
- resultsDiv.innerHTML="<h2>Results</h2>";
-
- selectedQuestions.forEach((q,i)=>{
-
-  const answer=document.querySelector(`input[name="q${i}"]:checked`);
-  const userAnswer=answer?answer.value:"None";
-
-  if(userAnswer===q.answer) score++;
-
-  resultsDiv.innerHTML+=`
-  <p>
-  <b>${i+1}. ${q.question}</b><br>
-  Your answer: ${userAnswer}<br>
-  Correct answer: ${q.answer}<br>
-  Rationale: ${q.rationale}
-  </p>
-  <hr>
-  `;
- });
-
- resultsDiv.innerHTML=`<h2>Score: ${score}/${selectedQuestions.length}</h2>`+resultsDiv.innerHTML;
-
-}
-
-loadQuestions();
+})
