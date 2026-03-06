@@ -44,6 +44,9 @@ startBtn.addEventListener("click", () => {
     const competency =
         document.getElementById("competency").value
 
+    const questionType =
+    document.getElementById("questionType").value
+
 
     // hide start screen
     document.getElementById("startMenu").style.display = "none"
@@ -51,13 +54,17 @@ startBtn.addEventListener("click", () => {
 
     if (competency === "all") {
 
-        generateExam(difficulty, questionCount)
+        generateExam(difficulty, questionCount, questionType)
 
     }
 
     else {
 
-        generateCompetencyPractice(competency, questionCount)
+        generateCompetencyPractice(
+    competency,
+    questionCount,
+    questionType
+)
 
     }
 
@@ -122,5 +129,6 @@ submitBtn.addEventListener("click", () => {
         submitExam()
 
     }
+
 
 })
