@@ -328,3 +328,12 @@ height:100%;
 background:#2c7be5;
 transition:width 0.4s ease;
 }
+
+
+.question-header{
+margin-bottom:15px;
+padding:8px 12px;
+background:#f4f7ff;
+border-radius:6px;
+font-weight:bold;
+}
