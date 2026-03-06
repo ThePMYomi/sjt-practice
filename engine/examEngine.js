@@ -18,7 +18,6 @@ let hardQuestions = []
 
 let incorrectQuestions = []
 
-
 let competencyIndex = {
 
     "patient-centred care": [],
@@ -70,47 +69,27 @@ function indexQuestions() {
     mediumQuestions = []
     hardQuestions = []
 
-    // reset competency buckets
-
     Object.keys(competencyIndex).forEach(key => {
-
         competencyIndex[key] = []
-
     })
 
     questionBank.forEach(q => {
 
-        // difficulty indexing
-
         if (q.difficulty === "easy") {
-
             easyQuestions.push(q)
-
         }
-
         else if (q.difficulty === "medium") {
-
             mediumQuestions.push(q)
-
         }
-
         else if (q.difficulty === "hard") {
-
             hardQuestions.push(q)
-
         }
-
-        // competency indexing
 
         if (competencyIndex[q.competency]) {
-
             competencyIndex[q.competency].push(q)
-
         }
 
     })
-
-    console.log("Questions indexed")
 
 }
 
@@ -124,29 +103,10 @@ export function generateExam(difficulty, numberOfQuestions) {
 
     let pool = []
 
-    if (difficulty === "easy") {
-
-        pool = easyQuestions
-
-    }
-
-    else if (difficulty === "medium") {
-
-        pool = mediumQuestions
-
-    }
-
-    else if (difficulty === "hard") {
-
-        pool = hardQuestions
-
-    }
-
-    else {
-
-        pool = questionBank
-
-    }
+    if (difficulty === "easy") pool = easyQuestions
+    else if (difficulty === "medium") pool = mediumQuestions
+    else if (difficulty === "hard") pool = hardQuestions
+    else pool = questionBank
 
     examQuestions = shuffle(pool).slice(0, numberOfQuestions)
 
@@ -163,7 +123,7 @@ export function generateExam(difficulty, numberOfQuestions) {
 
 
 // =======================
-// GENERATE COMPETENCY PRACTICE
+// COMPETENCY PRACTICE
 // =======================
 
 export function generateCompetencyPractice(competency, numberOfQuestions) {
@@ -185,7 +145,7 @@ export function generateCompetencyPractice(competency, numberOfQuestions) {
 
 
 // =======================
-// SHUFFLE QUESTIONS
+// SHUFFLE
 // =======================
 
 function shuffle(array) {
@@ -197,9 +157,7 @@ function shuffle(array) {
         const j = Math.floor(Math.random() * (i + 1))
 
         const temp = newArray[i]
-
         newArray[i] = newArray[j]
-
         newArray[j] = temp
 
     }
@@ -211,12 +169,10 @@ function shuffle(array) {
 
 
 // =======================
-// TIMER SYSTEM
+// TIMER
 // =======================
 
 function startTimer(questionCount) {
-
-    // ~1.9 minutes per question
 
     timeRemaining = Math.round(questionCount * 1.9 * 60)
 
@@ -227,16 +183,13 @@ function startTimer(questionCount) {
         timeRemaining--
 
         const minutes = Math.floor(timeRemaining / 60)
-
         const seconds = timeRemaining % 60
 
         timerDiv.innerText =
             minutes + ":" + (seconds < 10 ? "0" + seconds : seconds)
 
         if (timeRemaining <= 0) {
-
             submitExam()
-
         }
 
     }, 1000)
@@ -258,15 +211,11 @@ export function renderCurrentQuestion() {
     container.innerHTML = ""
 
     if (question.type === "ranking") {
-
         renderRankingQuestion(container, question, currentQuestionIndex)
-
     }
 
     if (question.type === "best3") {
-
         renderBest3Question(container, question, currentQuestionIndex)
-
     }
 
     updateNavigation(currentQuestionIndex, examQuestions.length)
@@ -280,9 +229,7 @@ export function renderCurrentQuestion() {
 // =======================
 
 export function saveAnswer(questionIndex, answer) {
-
     userAnswers[questionIndex] = answer
-
 }
 
 
@@ -301,30 +248,20 @@ export function goToQuestion(index) {
 
 }
 
-
-
 export function nextQuestion() {
 
     if (currentQuestionIndex < examQuestions.length - 1) {
-
         currentQuestionIndex++
-
         renderCurrentQuestion()
-
     }
 
 }
 
-
-
 export function previousQuestion() {
 
     if (currentQuestionIndex > 0) {
-
         currentQuestionIndex--
-
         renderCurrentQuestion()
-
     }
 
 }
@@ -372,7 +309,7 @@ export function submitExam() {
 
         totalScore += score
 
-        if(score === 0){
+        if (score === 0) {
             incorrectQuestions.push(q)
         }
 
@@ -392,18 +329,19 @@ export function submitExam() {
 // =======================
 // SHOW RESULTS
 // =======================
+
 function showResults(score, maxScore){
 
     const resultsDiv = document.getElementById("results")
 
-    const percent = Math.round((score / maxScore) * 100)
+    const examPercent = Math.round((score / maxScore) * 100)
 
     resultsDiv.innerHTML = `
         <h2>Exam Results</h2>
 
         <p><strong>Score:</strong> ${score} / ${maxScore}</p>
 
-        <p><strong>Percentage:</strong> ${percent}%</p>
+        <p><strong>Percentage:</strong> ${examPercent}%</p>
 
         <button id="reviewBtn">Review Questions</button>
 
@@ -411,45 +349,54 @@ function showResults(score, maxScore){
     `
 
 
-    // =======================
     // ANALYTICS
-    // =======================
 
-const analytics = calculateAnalytics()
+    const analytics = calculateAnalytics()
 
-let analyticsHTML = "<h3>Performance by Competency</h3>"
+    let analyticsHTML = "<h3>Performance by Competency</h3>"
 
-Object.entries(analytics).forEach(([comp,data])=>{
+    Object.entries(analytics).forEach(([comp,data])=>{
 
-    const percent =
-        data.max
-        ? Math.round((data.earned / data.max) * 100)
-        : 0
+        const competencyPercent =
+            data.max
+            ? Math.round((data.earned / data.max) * 100)
+            : 0
 
-    analyticsHTML += `
+        analyticsHTML += `
         <div class="competency-row">
-            <div class="competency-label">${comp} (${percent}%)</div>
+            <div class="competency-label">${comp} (${competencyPercent}%)</div>
             <div class="competency-bar">
-                <div class="competency-fill" style="width:${percent}%"></div>
+                <div class="competency-fill" style="width:${competencyPercent}%"></div>
             </div>
         </div>
-    `
+        `
 
-})
+    })
 
-resultsDiv.innerHTML += analyticsHTML
-
-
-    // review button
+    resultsDiv.innerHTML += analyticsHTML
 
     document.getElementById("reviewBtn").onclick = showReview
 
 }
 
 
-//=================================
 
-//==================================
+// =======================
+// ANALYTICS
+// =======================
+
+function calculateAnalytics(){
+
+    let stats = {}
+
+    examQuestions.forEach((q,i)=>{
+
+        if(!stats[q.competency]){
+            stats[q.competency] = {
+                earned:0,
+                max:0
+            }
+        }
 
         const userAnswer = userAnswers[i]
 
@@ -484,10 +431,12 @@ resultsDiv.innerHTML += analyticsHTML
     return stats
 
 }
-    
-//=========================
-// SHOW REVIEW
-//=========================
+
+
+
+// =======================
+// REVIEW QUESTIONS
+// =======================
 
 function showReview(){
 
@@ -506,9 +455,7 @@ function showReview(){
         html += `<p><strong>Options:</strong></p><ul>`
 
         Object.entries(q.options).forEach(([key,val])=>{
-
             html += `<li><b>${key}</b> — ${val}</li>`
-
         })
 
         html += `</ul>`
@@ -528,14 +475,13 @@ function showReview(){
 }
 
 
+
 function formatAnswer(answer){
 
     if(!answer) return "No answer given"
 
     if(Array.isArray(answer)){
-
         return answer.join(", ")
-
     }
 
     return answer
@@ -543,8 +489,9 @@ function formatAnswer(answer){
 }
 
 
+
 // =======================
-// Practice Incorrect Questions
+// PRACTICE INCORRECT
 // =======================
 
 export function practiceIncorrect(){
@@ -555,7 +502,6 @@ export function practiceIncorrect(){
     if(!saved || saved.length === 0){
 
         alert("No incorrect questions saved yet.")
-
         return
 
     }
@@ -572,75 +518,16 @@ export function practiceIncorrect(){
 
 }
 
-// =======================
-// Analytics Function
-// =======================
 
-
-function calculateAnalytics(){
-
-    let stats = {}
-
-    examQuestions.forEach((q,i)=>{
-
-        if(!stats[q.competency]){
-
-            stats[q.competency] = {
-                correct:0,
-                total:0
-            }
-
-        }
-
-        stats[q.competency].total++
-
-        const userAnswer = userAnswers[i]
-
-        if(!userAnswer) return
-
-        let score = 0
-
-        if(q.type === "ranking"){
-
-            score = scoreRanking(q.answer,userAnswer)
-
-        }
-
-        if(q.type === "best3"){
-
-            score = scoreBest3(q.answer,userAnswer)
-
-        }
-
-        if(score > 0){
-
-            stats[q.competency].correct++
-
-        }
-
-    })
-
-    return stats
-
-}
 
 // =======================
 // GETTERS
 // =======================
 
 export function getExamQuestions() {
-
     return examQuestions
-
 }
-
-
 
 export function getUserAnswers() {
-
     return userAnswers
-
-
 }
-
-
