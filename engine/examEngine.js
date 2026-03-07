@@ -372,7 +372,7 @@ function showImmediateFeedback(){
 
     <p><strong>Correct Answer:</strong> ${formatAnswer(question.answer)}</p>
 
-    <p><strong>Explanation:</strong> ${question.explanation}</p>
+    <p><strong>Explanation:</strong><br>${formatExplanation(question.explanation)}</p>
     `
 
 
@@ -653,7 +653,7 @@ function showReview(){
 
         html += `<p><strong>Correct Answer:</strong> ${formatAnswer(q.answer)}</p>`
 
-        html += `<p class="explanation"><strong>Explanation:</strong> ${q.explanation}</p>`
+        html += `<p class="explanation"><strong>Explanation:</strong><br>${formatExplanation(q.explanation)}</p>`
 
 
 
@@ -675,6 +675,31 @@ function showReview(){
         quiz.innerHTML += html
 
     })
+
+}
+
+//=====================
+// FORMAT EXPLANATION
+//========================
+function formatExplanation(text){
+
+    if(!text) return ""
+
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text]
+
+    let formatted = ""
+
+    for(let i=0;i<sentences.length;i++){
+
+        formatted += sentences[i].trim() + " "
+
+        if((i+1) % 2 === 0){
+            formatted += "<br><br>"
+        }
+
+    }
+
+    return formatted
 
 }
 
@@ -743,3 +768,4 @@ export function getUserAnswers(){
 export function getFlaggedQuestions(){
     return flaggedQuestions
 }
+
