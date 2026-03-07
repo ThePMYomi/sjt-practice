@@ -119,18 +119,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const submitBtn = document.getElementById("submitBtn")
 
-    submitBtn.addEventListener("click", () => {
+submitBtn.addEventListener("click", () => {
 
-        const confirmSubmit = confirm(
-            "Are you sure you want to submit the exam?"
-        )
-
-        if (confirmSubmit) {
-
-            submitExam()
-
-        }
-
-    })
+    showReviewScreen()
 
 })
+
+})
+
