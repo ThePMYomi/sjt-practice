@@ -34,23 +34,30 @@ export function updateNavigation(currentIndex, totalQuestions){
         }
 
 
-        // ANSWERED QUESTION
-        if(answers[i]){
-
-            box.classList.add("answered")
-
-        }
-
-
         // FLAGGED QUESTION
-        if(flagged.has(i)){
+        else if(flagged.has(i)){
 
             box.classList.add("flagged")
 
         }
 
 
-        // CLICK NAVIGATION
+        // ANSWERED QUESTION
+        else if(answers[i]){
+
+            box.classList.add("answered")
+
+        }
+
+
+        // UNANSWERED
+        else{
+
+            box.classList.add("unanswered")
+
+        }
+
+
         box.onclick = () => {
 
             goToQuestion(i)
