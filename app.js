@@ -40,6 +40,9 @@ startBtn.addEventListener("click", () => {
 
     const questionCount =
         parseInt(document.getElementById("questionCount").value)
+    
+    const practiceMode =
+        document.getElementById("practiceMode").value
 
     const competency =
         document.getElementById("competency").value
@@ -54,7 +57,7 @@ startBtn.addEventListener("click", () => {
 
     if (competency === "all") {
 
-        generateExam(difficulty, questionCount, questionType)
+        generateExam(difficulty, questionCount, questionType, practiceMode)
 
     }
 
@@ -63,7 +66,8 @@ startBtn.addEventListener("click", () => {
         generateCompetencyPractice(
     competency,
     questionCount,
-    questionType
+    questionType,
+    practiceMode
 )
 
     }
@@ -132,3 +136,4 @@ submitBtn.addEventListener("click", () => {
 
 
 })
+
