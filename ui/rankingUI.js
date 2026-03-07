@@ -27,7 +27,33 @@ export function renderRankingQuestion(container, question, questionIndex){
 
 
 
-    Object.entries(question.options).forEach(([key,value])=>{
+    // ==========================
+    // RESTORE SAVED ORDER
+    // ==========================
+
+    const savedAnswers = getUserAnswers()
+
+    const savedRanking = savedAnswers[questionIndex]
+
+    let optionsOrder
+
+    if(savedRanking && Array.isArray(savedRanking)){
+        optionsOrder = savedRanking
+        list.classList.add("ranking-answered")
+    }
+    else{
+        optionsOrder = Object.keys(question.options)
+    }
+
+
+
+    // ==========================
+    // RENDER OPTIONS
+    // ==========================
+
+    optionsOrder.forEach((key)=>{
+
+        const value = question.options[key]
 
         const item = document.createElement("li")
 
@@ -60,6 +86,10 @@ export function renderRankingQuestion(container, question, questionIndex){
 
 
 
+    // ==========================
+    // DRAG AND DROP
+    // ==========================
+
     new Sortable(list,{
 
         animation:150,
@@ -71,7 +101,11 @@ export function renderRankingQuestion(container, question, questionIndex){
             saveAnswer(questionIndex,answer)
 
 
-            // visual highlight when order changes
+            // mark question visually answered
+            list.classList.add("ranking-answered")
+
+
+            // highlight reorder animation
             list.classList.add("ranking-changed")
 
             setTimeout(()=>{
@@ -79,7 +113,7 @@ export function renderRankingQuestion(container, question, questionIndex){
             },600)
 
 
-            // show small confirmation message
+            // show confirmation notice
             showRankingNotice(list)
 
         }
@@ -136,4 +170,3 @@ function showRankingNotice(list){
     },1000)
 
 }
-
