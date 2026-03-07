@@ -1,6 +1,6 @@
 // rankingUI.js
 
-import { saveAnswer } from "../engine/examEngine.js"
+import { saveAnswer, getUserAnswers } from "../engine/examEngine.js"
 
 
 export function renderRankingQuestion(container, question, questionIndex){
@@ -136,3 +136,4 @@ function showRankingNotice(list){
     },1000)
 
 }
+
