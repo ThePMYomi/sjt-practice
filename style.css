@@ -432,3 +432,73 @@ border:none;
 border-radius:6px;
 cursor:pointer;
 }
+
+/* =========================
+   QUESTION PALETTE
+========================= */
+
+#navigation{
+display:grid;
+grid-template-columns:repeat(auto-fill,40px);
+gap:8px;
+margin-top:15px;
+}
+
+
+.nav-question{
+
+width:40px;
+height:40px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+border-radius:6px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+transition:0.2s;
+
+}
+
+
+/* CURRENT QUESTION */
+
+.nav-question.current{
+background:#3498db;
+color:white;
+}
+
+
+/* ANSWERED */
+
+.nav-question.answered{
+background:#2ecc71;
+color:white;
+}
+
+
+/* FLAGGED */
+
+.nav-question.flagged{
+background:#f39c12;
+color:white;
+}
+
+
+/* UNANSWERED */
+
+.nav-question.unanswered{
+background:#ecf0f1;
+color:#555;
+}
+
+
+/* HOVER */
+
+.nav-question:hover{
+transform:scale(1.08);
+}
