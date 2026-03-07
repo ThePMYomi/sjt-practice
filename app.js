@@ -7,7 +7,8 @@ import {
     nextQuestion,
     previousQuestion,
     submitExam,
-    practiceIncorrect
+    practiceIncorrect,
+    showReviewScreen
 } from "./engine/examEngine.js"
 
 
@@ -126,4 +127,5 @@ submitBtn.addEventListener("click", () => {
 })
 
 })
+
 
