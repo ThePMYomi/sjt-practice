@@ -697,6 +697,27 @@ function showReview(){
 
         html += `<p class="explanation"><strong>Explanation:</strong> ${q.explanation}</p>`
 
+// =======================
+// LEARNING POINTS
+// =======================
+
+if(q.learningPoints){
+
+    html += `<div class="learning-points">`
+    html += `<p><strong>Key Learning Points</strong></p>`
+    html += `<ul>`
+
+    q.learningPoints.forEach(point => {
+
+        html += `<li>${point}</li>`
+
+    })
+
+    html += `</ul>`
+    html += `</div>`
+
+}
+
         html += `</div>`
 
         quiz.innerHTML += html
@@ -770,4 +791,5 @@ export function getUserAnswers(){
 export function getFlaggedQuestions(){
     return flaggedQuestions
 }
+
 
