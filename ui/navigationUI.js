@@ -1,6 +1,10 @@
 // navigationUI.js
 
-import { goToQuestion, getUserAnswers } from "../engine/examEngine.js"
+import {
+    goToQuestion,
+    getUserAnswers,
+    getFlaggedQuestions
+} from "../engine/examEngine.js"
 
 
 export function updateNavigation(currentIndex, totalQuestions){
@@ -8,6 +12,8 @@ export function updateNavigation(currentIndex, totalQuestions){
     const nav = document.getElementById("navigation")
 
     const answers = getUserAnswers()
+
+    const flagged = getFlaggedQuestions()
 
     nav.innerHTML = ""
 
@@ -19,20 +25,32 @@ export function updateNavigation(currentIndex, totalQuestions){
 
         box.innerText = i + 1
 
-        // current question
+
+        // CURRENT QUESTION
         if(i === currentIndex){
 
             box.classList.add("current")
 
         }
 
-        // answered question
+
+        // ANSWERED QUESTION
         if(answers[i]){
 
             box.classList.add("answered")
 
         }
 
+
+        // FLAGGED QUESTION
+        if(flagged.has(i)){
+
+            box.classList.add("flagged")
+
+        }
+
+
+        // CLICK NAVIGATION
         box.onclick = () => {
 
             goToQuestion(i)
