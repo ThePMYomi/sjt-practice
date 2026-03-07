@@ -18,6 +18,8 @@ let hardQuestions = []
 
 let incorrectQuestions = []
 
+let flaggedQuestions = new Set()
+
 let competencyIndex = {
 
     "patient-centred care": [],
@@ -315,6 +317,25 @@ export function renderCurrentQuestion() {
 
     container.appendChild(header)
 
+    const flagBtn = document.createElement("button")
+
+    flagBtn.className = "flag-btn"
+    
+    flagBtn.innerText =
+    flaggedQuestions.has(currentQuestionIndex)
+    ? "Unflag"
+    : "⚑ Flag for Review"
+    
+    flagBtn.onclick = () => {
+    
+        toggleFlag(currentQuestionIndex)
+    
+        renderCurrentQuestion()
+    
+    }
+    
+    header.appendChild(flagBtn)
+
     if (question.type === "ranking") {
 
         renderRankingQuestion(container, question, currentQuestionIndex)
@@ -374,7 +395,22 @@ export function previousQuestion() {
 
 }
 
+//==========================
+// FLAG TOGGLE
+// =======================
 
+export function toggleFlag(questionIndex){
+
+    if(flaggedQuestions.has(questionIndex)){
+        flaggedQuestions.delete(questionIndex)
+    }
+    else{
+        flaggedQuestions.add(questionIndex)
+    }
+
+    updateNavigation(currentQuestionIndex, examQuestions.length)
+
+}
 
 // =======================
 // SUBMIT EXAM
@@ -639,4 +675,5 @@ export function getExamQuestions() {
 export function getUserAnswers() {
     return userAnswers
 }
+
 
