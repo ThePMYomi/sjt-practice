@@ -49,7 +49,7 @@ let timeRemaining = 0
 // LOAD QUESTION BANK
 // =======================
 
-export async function loadQuestionBank() {
+export async function loadQuestionBank(){
 
     const response = await fetch("./data/questions.json")
 
@@ -65,23 +65,23 @@ export async function loadQuestionBank() {
 // INDEX QUESTIONS
 // =======================
 
-function indexQuestions() {
+function indexQuestions(){
 
     easyQuestions = []
     mediumQuestions = []
     hardQuestions = []
 
-    Object.keys(competencyIndex).forEach(key => {
+    Object.keys(competencyIndex).forEach(key=>{
         competencyIndex[key] = []
     })
 
-    questionBank.forEach(q => {
+    questionBank.forEach(q=>{
 
-        if (q.difficulty === "easy") easyQuestions.push(q)
-        else if (q.difficulty === "medium") mediumQuestions.push(q)
-        else if (q.difficulty === "hard") hardQuestions.push(q)
+        if(q.difficulty === "easy") easyQuestions.push(q)
+        else if(q.difficulty === "medium") mediumQuestions.push(q)
+        else if(q.difficulty === "hard") hardQuestions.push(q)
 
-        if (competencyIndex[q.competency]) {
+        if(competencyIndex[q.competency]){
             competencyIndex[q.competency].push(q)
         }
 
@@ -95,15 +95,15 @@ function indexQuestions() {
 // GENERATE EXAM
 // =======================
 
-export function generateExam(difficulty, numberOfQuestions, questionType, mode) {
+export function generateExam(difficulty, numberOfQuestions, questionType, mode){
 
     currentMode = mode || "exam"
 
     let pool = []
 
-    if (difficulty === "easy") pool = easyQuestions
-    else if (difficulty === "medium") pool = mediumQuestions
-    else if (difficulty === "hard") pool = hardQuestions
+    if(difficulty === "easy") pool = easyQuestions
+    else if(difficulty === "medium") pool = mediumQuestions
+    else if(difficulty === "hard") pool = hardQuestions
     else pool = questionBank
 
     buildQuestionSet(pool, numberOfQuestions, questionType)
@@ -130,7 +130,7 @@ export function generateCompetencyPractice(
     numberOfQuestions,
     questionType,
     mode
-) {
+){
 
     currentMode = mode || "exam"
 
@@ -157,24 +157,29 @@ export function generateCompetencyPractice(
 
 function buildQuestionSet(pool, numberOfQuestions, questionType){
 
-    let rankingPool = pool.filter(q => q.type === "ranking")
-    let best3Pool = pool.filter(q => q.type === "best3")
+    if(pool.length === 0){
+        alert("No questions available for this selection.")
+        return
+    }
 
-    if (questionType === "ranking") {
+    let rankingPool = pool.filter(q=>q.type === "ranking")
+    let best3Pool = pool.filter(q=>q.type === "best3")
+
+    if(questionType === "ranking"){
 
         examQuestions =
             shuffle(rankingPool).slice(0, numberOfQuestions)
 
     }
 
-    else if (questionType === "best3") {
+    else if(questionType === "best3"){
 
         examQuestions =
             shuffle(best3Pool).slice(0, numberOfQuestions)
 
     }
 
-    else {
+    else{
 
         let rankingCount =
             Math.round(numberOfQuestions * 0.7)
@@ -209,13 +214,13 @@ function buildQuestionSet(pool, numberOfQuestions, questionType){
 // SHUFFLE
 // =======================
 
-function shuffle(array) {
+function shuffle(array){
 
     let newArray = [...array]
 
-    for (let i = newArray.length - 1; i > 0; i--) {
+    for(let i=newArray.length-1;i>0;i--){
 
-        const j = Math.floor(Math.random() * (i + 1))
+        const j = Math.floor(Math.random()*(i+1))
 
         const temp = newArray[i]
 
@@ -234,25 +239,29 @@ function shuffle(array) {
 // TIMER
 // =======================
 
-function startTimer(questionCount) {
+function startTimer(questionCount){
+
+    clearInterval(timerInterval)
 
     timeRemaining = Math.round(questionCount * 1.9 * 60)
 
     const timerDiv = document.getElementById("timer")
 
-    timerInterval = setInterval(() => {
+    timerInterval = setInterval(()=>{
 
         timeRemaining--
 
-        const minutes = Math.floor(timeRemaining / 60)
+        const minutes = Math.floor(timeRemaining/60)
         const seconds = timeRemaining % 60
 
         timerDiv.innerText =
-            minutes + ":" + (seconds < 10 ? "0" + seconds : seconds)
+            minutes + ":" + (seconds < 10 ? "0"+seconds : seconds)
 
-        if (timeRemaining <= 0) submitExam()
+        if(timeRemaining <= 0){
+            submitExam()
+        }
 
-    }, 1000)
+    },1000)
 
 }
 
@@ -262,7 +271,7 @@ function startTimer(questionCount) {
 // RENDER QUESTION
 // =======================
 
-export function renderCurrentQuestion() {
+export function renderCurrentQuestion(){
 
     if(!examQuestions[currentQuestionIndex]) return
 
@@ -278,7 +287,7 @@ export function renderCurrentQuestion() {
     header.className = "question-header"
 
     header.innerHTML =
-    `<h3>Question ${currentQuestionIndex + 1} of ${examQuestions.length}</h3>`
+    `<h3>Question ${currentQuestionIndex+1} of ${examQuestions.length}</h3>`
 
     container.appendChild(header)
 
@@ -293,7 +302,7 @@ export function renderCurrentQuestion() {
         ? "Unflag"
         : "⚑ Flag for Review"
 
-    flagBtn.onclick = () => {
+    flagBtn.onclick = ()=>{
 
         toggleFlag(currentQuestionIndex)
 
@@ -305,15 +314,12 @@ export function renderCurrentQuestion() {
 
 
 
-    if (question.type === "ranking") {
-
+    if(question.type === "ranking"){
         renderRankingQuestion(container, question, currentQuestionIndex)
-
     }
-    else if (question.type === "best3") {
 
+    else if(question.type === "best3"){
         renderBest3Question(container, question, currentQuestionIndex)
-
     }
 
 
@@ -326,7 +332,7 @@ export function renderCurrentQuestion() {
 
         checkBtn.innerText = "Check Answer"
 
-        checkBtn.onclick = () => showImmediateFeedback()
+        checkBtn.onclick = ()=>showImmediateFeedback()
 
         container.appendChild(checkBtn)
 
@@ -360,7 +366,6 @@ function showImmediateFeedback(){
     feedback.className = "immediate-feedback"
 
     feedback.innerHTML = `
-
     <h4>Answer Feedback</h4>
 
     <p><strong>Your Answer:</strong> ${formatAnswer(userAnswer)}</p>
@@ -368,8 +373,21 @@ function showImmediateFeedback(){
     <p><strong>Correct Answer:</strong> ${formatAnswer(question.answer)}</p>
 
     <p><strong>Explanation:</strong> ${question.explanation}</p>
-
     `
+
+
+
+    if(question.learningPoints){
+
+        feedback.innerHTML += `
+        <div class="learning-points">
+            <p><strong>Key Learning Points</strong></p>
+            <ul>
+                ${question.learningPoints.map(p=>`<li>${p}</li>`).join("")}
+            </ul>
+        </div>
+        `
+    }
 
     document.getElementById("quiz").appendChild(feedback)
 
@@ -381,7 +399,7 @@ function showImmediateFeedback(){
 // SAVE ANSWER
 // =======================
 
-export function saveAnswer(questionIndex, answer) {
+export function saveAnswer(questionIndex, answer){
 
     userAnswers[questionIndex] = answer
 
@@ -395,7 +413,7 @@ export function saveAnswer(questionIndex, answer) {
 
 export function goToQuestion(index){
 
-    if (index < 0 || index >= examQuestions.length) return
+    if(index<0 || index>=examQuestions.length) return
 
     currentQuestionIndex = index
 
@@ -407,7 +425,7 @@ export function goToQuestion(index){
 
 export function nextQuestion(){
 
-    if (currentQuestionIndex < examQuestions.length - 1){
+    if(currentQuestionIndex < examQuestions.length-1){
 
         currentQuestionIndex++
 
@@ -421,7 +439,7 @@ export function nextQuestion(){
 
 export function previousQuestion(){
 
-    if (currentQuestionIndex > 0){
+    if(currentQuestionIndex > 0){
 
         currentQuestionIndex--
 
@@ -430,70 +448,6 @@ export function previousQuestion(){
     }
 
 }
-
-// =====================
-// SHOW REVIEW SCREEN
-//======================
-
-export function showReviewScreen(){
-
-    const quiz = document.getElementById("quiz")
-
-    quiz.innerHTML = "<h2>Review Your Answers</h2>"
-
-    const grid = document.createElement("div")
-
-    grid.className = "review-grid"
-
-    examQuestions.forEach((q,i)=>{
-
-        const box = document.createElement("div")
-
-        box.className = "review-box"
-
-        let symbol = "-"
-
-        if(userAnswers[i]) symbol = "✔"
-
-        if(flaggedQuestions.has(i)) symbol = "⚑"
-
-        box.innerHTML = `
-            <div class="review-number">${i+1}</div>
-            <div class="review-status">${symbol}</div>
-        `
-
-        box.onclick = () => {
-            goToQuestion(i)
-        }
-
-        grid.appendChild(box)
-
-    })
-
-    quiz.appendChild(grid)
-
-
-    const submitBtn = document.createElement("button")
-
-    submitBtn.className = "final-submit-btn"
-
-    submitBtn.innerText = "Submit Exam"
-
-    submitBtn.onclick = () => {
-
-        const confirmSubmit =
-        confirm("Submit your exam now?")
-
-        if(confirmSubmit){
-            submitExam()
-        }
-
-    }
-
-    quiz.appendChild(submitBtn)
-
-}
-
 
 
 
@@ -527,27 +481,27 @@ export function submitExam(){
 
     incorrectQuestions = []
 
-    examQuestions.forEach((q, i) => {
+    examQuestions.forEach((q,i)=>{
 
         const userAnswer = userAnswers[i]
 
         let score = 0
 
-        if (q.type === "ranking"){
+        if(q.type === "ranking"){
 
             maxScore += 20
 
-            if (userAnswer)
-                score = scoreRanking(q.answer, userAnswer)
+            if(userAnswer)
+                score = scoreRanking(q.answer,userAnswer)
 
         }
 
-        if (q.type === "best3"){
+        if(q.type === "best3"){
 
             maxScore += 12
 
-            if (userAnswer)
-                score = scoreBest3(q.answer, userAnswer)
+            if(userAnswer)
+                score = scoreBest3(q.answer,userAnswer)
 
         }
 
@@ -557,12 +511,16 @@ export function submitExam(){
 
     })
 
+
+
     localStorage.setItem(
         "incorrectSJTQuestions",
         JSON.stringify(incorrectQuestions)
     )
 
-    showResults(totalScore, maxScore)
+
+
+    showResults(totalScore,maxScore)
 
 }
 
@@ -572,12 +530,12 @@ export function submitExam(){
 // SHOW RESULTS
 // =======================
 
-function showResults(score, maxScore){
+function showResults(score,maxScore){
 
     const resultsDiv = document.getElementById("results")
 
     const examPercent =
-        Math.round((score / maxScore) * 100)
+        Math.round((score/maxScore)*100)
 
     resultsDiv.innerHTML = `
         <h2>Exam Results</h2>
@@ -697,26 +655,20 @@ function showReview(){
 
         html += `<p class="explanation"><strong>Explanation:</strong> ${q.explanation}</p>`
 
-// =======================
-// LEARNING POINTS
-// =======================
 
-if(q.learningPoints){
 
-    html += `<div class="learning-points">`
-    html += `<p><strong>Key Learning Points</strong></p>`
-    html += `<ul>`
+        if(q.learningPoints){
 
-    q.learningPoints.forEach(point => {
+            html += `
+            <div class="learning-points">
+                <p><strong>Key Learning Points</strong></p>
+                <ul>
+                    ${q.learningPoints.map(p=>`<li>${p}</li>`).join("")}
+                </ul>
+            </div>
+            `
 
-        html += `<li>${point}</li>`
-
-    })
-
-    html += `</ul>`
-    html += `</div>`
-
-}
+        }
 
         html += `</div>`
 
@@ -791,5 +743,3 @@ export function getUserAnswers(){
 export function getFlaggedQuestions(){
     return flaggedQuestions
 }
-
-
