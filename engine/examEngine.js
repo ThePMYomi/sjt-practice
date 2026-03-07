@@ -431,6 +431,70 @@ export function previousQuestion(){
 
 }
 
+// =====================
+// SHOW REVIEW SCREEN
+//======================
+
+export function showReviewScreen(){
+
+    const quiz = document.getElementById("quiz")
+
+    quiz.innerHTML = "<h2>Review Your Answers</h2>"
+
+    const grid = document.createElement("div")
+
+    grid.className = "review-grid"
+
+    examQuestions.forEach((q,i)=>{
+
+        const box = document.createElement("div")
+
+        box.className = "review-box"
+
+        let symbol = "-"
+
+        if(userAnswers[i]) symbol = "✔"
+
+        if(flaggedQuestions.has(i)) symbol = "⚑"
+
+        box.innerHTML = `
+            <div class="review-number">${i+1}</div>
+            <div class="review-status">${symbol}</div>
+        `
+
+        box.onclick = () => {
+            goToQuestion(i)
+        }
+
+        grid.appendChild(box)
+
+    })
+
+    quiz.appendChild(grid)
+
+
+    const submitBtn = document.createElement("button")
+
+    submitBtn.className = "final-submit-btn"
+
+    submitBtn.innerText = "Submit Exam"
+
+    submitBtn.onclick = () => {
+
+        const confirmSubmit =
+        confirm("Submit your exam now?")
+
+        if(confirmSubmit){
+            submitExam()
+        }
+
+    }
+
+    quiz.appendChild(submitBtn)
+
+}
+
+
 
 
 // =======================
@@ -706,3 +770,4 @@ export function getUserAnswers(){
 export function getFlaggedQuestions(){
     return flaggedQuestions
 }
+
