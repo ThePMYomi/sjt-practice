@@ -3,7 +3,6 @@
 import { saveAnswer } from "../engine/examEngine.js"
 
 
-
 export function renderRankingQuestion(container, question, questionIndex){
 
     const scenario = document.createElement("div")
@@ -53,6 +52,8 @@ export function renderRankingQuestion(container, question, questionIndex){
 
     const instruction = document.createElement("p")
 
+    instruction.className = "ranking-instruction"
+
     instruction.innerText = "Drag the options to reorder them."
 
     container.appendChild(instruction)
@@ -69,6 +70,18 @@ export function renderRankingQuestion(container, question, questionIndex){
 
             saveAnswer(questionIndex,answer)
 
+
+            // visual highlight when order changes
+            list.classList.add("ranking-changed")
+
+            setTimeout(()=>{
+                list.classList.remove("ranking-changed")
+            },600)
+
+
+            // show small confirmation message
+            showRankingNotice(list)
+
         }
 
     })
@@ -77,6 +90,10 @@ export function renderRankingQuestion(container, question, questionIndex){
 
 
 
+// =======================
+// GET CURRENT ORDER
+// =======================
+
 function getCurrentRanking(list){
 
     const items = list.querySelectorAll("li")
@@ -84,11 +101,38 @@ function getCurrentRanking(list){
     const ranking = []
 
     items.forEach(item=>{
-
         ranking.push(item.dataset.option)
-
     })
 
     return ranking
+
+}
+
+
+
+// =======================
+// SHOW "ORDER UPDATED"
+// =======================
+
+function showRankingNotice(list){
+
+    const existingNotice =
+        list.querySelector(".ranking-notice")
+
+    if(existingNotice){
+        existingNotice.remove()
+    }
+
+    const notice = document.createElement("div")
+
+    notice.className = "ranking-notice"
+
+    notice.innerText = "Order updated ✓"
+
+    list.prepend(notice)
+
+    setTimeout(()=>{
+        notice.remove()
+    },1000)
 
 }
