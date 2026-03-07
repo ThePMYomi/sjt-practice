@@ -337,3 +337,34 @@ background:#f4f7ff;
 border-radius:6px;
 font-weight:bold;
 }
+
+.nav-question.flagged{
+background:#f39c12;
+color:white;
+}
+
+/* highlight when order changes */
+
+.ranking-changed{
+background:#e8f5e9;
+transition:background 0.4s;
+}
+
+
+/* reorder notice */
+
+.ranking-notice{
+font-size:12px;
+color:#27ae60;
+margin-bottom:6px;
+font-weight:bold;
+}
+
+
+/* optional nicer instruction styling */
+
+.ranking-instruction{
+margin-top:8px;
+font-size:14px;
+color:#555;
+}
