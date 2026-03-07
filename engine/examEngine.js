@@ -18,6 +18,8 @@ let hardQuestions = []
 
 let incorrectQuestions = []
 
+let currentMode = "exam"
+
 let flaggedQuestions = new Set()
 
 let competencyIndex = {
@@ -101,8 +103,9 @@ function indexQuestions() {
 // GENERATE EXAM
 // =======================
 
-export function generateExam(difficulty, numberOfQuestions, questionType) {
+export function generateExam(difficulty, numberOfQuestions, questionType, mode) {
 
+    currentMode = mode || "exam"
     let pool = []
 
     if (difficulty === "easy") pool = easyQuestions
@@ -181,9 +184,11 @@ else {
 export function generateCompetencyPractice(
     competency,
     numberOfQuestions,
-    questionType
+    questionType,
+    mode
 ) {
-
+    currentMode = mode || "exam"
+    
     let pool = competencyIndex[competency] || []
 
     let rankingPool = pool.filter(q => q.type === "ranking")
@@ -347,7 +352,64 @@ export function renderCurrentQuestion() {
 
     }
 
+    if(currentMode === "learn"){
+
+const checkBtn = document.createElement("button")
+
+checkBtn.className = "check-answer-btn"
+
+checkBtn.innerText = "Check Answer"
+
+checkBtn.onclick = () => {
+
+showImmediateFeedback()
+
+}
+
+container.appendChild(checkBtn)
+
+}
+
     updateNavigation(currentQuestionIndex, examQuestions.length)
+
+}
+
+
+//=============
+//Show IMMEDIATE FEEDBACK
+//=============
+
+function showImmediateFeedback(){
+
+const question = examQuestions[currentQuestionIndex]
+
+const userAnswer = userAnswers[currentQuestionIndex]
+
+const feedback = document.createElement("div")
+
+feedback.className = "immediate-feedback"
+
+let correctAnswer = question.answer
+
+feedback.innerHTML = `
+
+<h4>Answer Feedback</h4>
+
+<p><strong>Your Answer:</strong> ${
+formatAnswer(userAnswer)
+}</p>
+
+<p><strong>Correct Answer:</strong> ${
+formatAnswer(correctAnswer)
+}</p>
+
+<p><strong>Explanation:</strong> ${
+question.explanation
+}</p>
+
+`
+
+document.getElementById("quiz").appendChild(feedback)
 
 }
 
@@ -675,5 +737,6 @@ export function getExamQuestions() {
 export function getUserAnswers() {
     return userAnswers
 }
+
 
 
