@@ -55,8 +55,6 @@ export async function loadQuestionBank() {
 
     questionBank = await response.json()
 
-    console.log("Questions loaded:", questionBank.length)
-
     indexQuestions()
 
 }
@@ -79,15 +77,9 @@ function indexQuestions() {
 
     questionBank.forEach(q => {
 
-        if (q.difficulty === "easy") {
-            easyQuestions.push(q)
-        }
-        else if (q.difficulty === "medium") {
-            mediumQuestions.push(q)
-        }
-        else if (q.difficulty === "hard") {
-            hardQuestions.push(q)
-        }
+        if (q.difficulty === "easy") easyQuestions.push(q)
+        else if (q.difficulty === "medium") mediumQuestions.push(q)
+        else if (q.difficulty === "hard") hardQuestions.push(q)
 
         if (competencyIndex[q.competency]) {
             competencyIndex[q.competency].push(q)
@@ -106,6 +98,7 @@ function indexQuestions() {
 export function generateExam(difficulty, numberOfQuestions, questionType, mode) {
 
     currentMode = mode || "exam"
+
     let pool = []
 
     if (difficulty === "easy") pool = easyQuestions
@@ -113,59 +106,10 @@ export function generateExam(difficulty, numberOfQuestions, questionType, mode) 
     else if (difficulty === "hard") pool = hardQuestions
     else pool = questionBank
 
-
-    let rankingPool = pool.filter(q => q.type === "ranking")
-    let best3Pool = pool.filter(q => q.type === "best3")
-
-
-    if (questionType === "ranking") {
-
-        examQuestions = shuffle(rankingPool).slice(0, numberOfQuestions)
-
-    }
-
-    else if (questionType === "best3") {
-
-        examQuestions = shuffle(best3Pool).slice(0, numberOfQuestions)
-
-    }
-
-else {
-
-    // REALISTIC DISTRIBUTION
-    // 70% ranking, 30% best3
-
-    let rankingCount =
-        Math.round(numberOfQuestions * 0.7)
-
-    let best3Count =
-        numberOfQuestions - rankingCount
-
-
-    // Prevent requesting more questions than available
-
-    rankingCount = Math.min(rankingCount, rankingPool.length)
-    best3Count = Math.min(best3Count, best3Pool.length)
-
-
-    const rankingQuestions =
-        shuffle(rankingPool).slice(0, rankingCount)
-
-    const best3Questions =
-        shuffle(best3Pool).slice(0, best3Count)
-
-
-    // Ranking questions must come first
-
-    examQuestions = [
-        ...rankingQuestions,
-        ...best3Questions
-    ]
-
-}
-
+    buildQuestionSet(pool, numberOfQuestions, questionType)
 
     userAnswers = {}
+    flaggedQuestions = new Set()
 
     currentQuestionIndex = 0
 
@@ -187,13 +131,34 @@ export function generateCompetencyPractice(
     questionType,
     mode
 ) {
+
     currentMode = mode || "exam"
-    
+
     let pool = competencyIndex[competency] || []
+
+    buildQuestionSet(pool, numberOfQuestions, questionType)
+
+    userAnswers = {}
+    flaggedQuestions = new Set()
+
+    currentQuestionIndex = 0
+
+    startTimer(numberOfQuestions)
+
+    renderCurrentQuestion()
+
+}
+
+
+
+// =======================
+// BUILD QUESTION SET
+// =======================
+
+function buildQuestionSet(pool, numberOfQuestions, questionType){
 
     let rankingPool = pool.filter(q => q.type === "ranking")
     let best3Pool = pool.filter(q => q.type === "best3")
-
 
     if (questionType === "ranking") {
 
@@ -209,40 +174,32 @@ export function generateCompetencyPractice(
 
     }
 
-else {
+    else {
 
-    let rankingCount =
-        Math.round(numberOfQuestions * 0.7)
+        let rankingCount =
+            Math.round(numberOfQuestions * 0.7)
 
-    let best3Count =
-        numberOfQuestions - rankingCount
+        let best3Count =
+            numberOfQuestions - rankingCount
 
+        rankingCount =
+            Math.min(rankingCount, rankingPool.length)
 
-    rankingCount = Math.min(rankingCount, rankingPool.length)
-    best3Count = Math.min(best3Count, best3Pool.length)
+        best3Count =
+            Math.min(best3Count, best3Pool.length)
 
+        const rankingQuestions =
+            shuffle(rankingPool).slice(0, rankingCount)
 
-    const rankingQuestions =
-        shuffle(rankingPool).slice(0, rankingCount)
+        const best3Questions =
+            shuffle(best3Pool).slice(0, best3Count)
 
-    const best3Questions =
-        shuffle(best3Pool).slice(0, best3Count)
+        examQuestions = [
+            ...rankingQuestions,
+            ...best3Questions
+        ]
 
-
-    examQuestions = [
-        ...rankingQuestions,
-        ...best3Questions
-    ]
-
-}
-
-    userAnswers = {}
-
-    currentQuestionIndex = 0
-
-    startTimer(numberOfQuestions)
-
-    renderCurrentQuestion()
+    }
 
 }
 
@@ -261,6 +218,7 @@ function shuffle(array) {
         const j = Math.floor(Math.random() * (i + 1))
 
         const temp = newArray[i]
+
         newArray[i] = newArray[j]
         newArray[j] = temp
 
@@ -292,9 +250,7 @@ function startTimer(questionCount) {
         timerDiv.innerText =
             minutes + ":" + (seconds < 10 ? "0" + seconds : seconds)
 
-        if (timeRemaining <= 0) {
-            submitExam()
-        }
+        if (timeRemaining <= 0) submitExam()
 
     }, 1000)
 
@@ -308,11 +264,15 @@ function startTimer(questionCount) {
 
 export function renderCurrentQuestion() {
 
+    if(!examQuestions[currentQuestionIndex]) return
+
     const question = examQuestions[currentQuestionIndex]
 
     const container = document.getElementById("quiz")
 
     container.innerHTML = ""
+
+
 
     const header = document.createElement("div")
     header.className = "question-header"
@@ -322,24 +282,28 @@ export function renderCurrentQuestion() {
 
     container.appendChild(header)
 
+
+
     const flagBtn = document.createElement("button")
 
     flagBtn.className = "flag-btn"
-    
+
     flagBtn.innerText =
-    flaggedQuestions.has(currentQuestionIndex)
-    ? "Unflag"
-    : "⚑ Flag for Review"
-    
+        flaggedQuestions.has(currentQuestionIndex)
+        ? "Unflag"
+        : "⚑ Flag for Review"
+
     flagBtn.onclick = () => {
-    
+
         toggleFlag(currentQuestionIndex)
-    
+
         renderCurrentQuestion()
-    
+
     }
-    
+
     header.appendChild(flagBtn)
+
+
 
     if (question.type === "ranking") {
 
@@ -352,64 +316,62 @@ export function renderCurrentQuestion() {
 
     }
 
+
+
     if(currentMode === "learn"){
 
-const checkBtn = document.createElement("button")
+        const checkBtn = document.createElement("button")
 
-checkBtn.className = "check-answer-btn"
+        checkBtn.className = "check-answer-btn"
 
-checkBtn.innerText = "Check Answer"
+        checkBtn.innerText = "Check Answer"
 
-checkBtn.onclick = () => {
+        checkBtn.onclick = () => showImmediateFeedback()
 
-showImmediateFeedback()
+        container.appendChild(checkBtn)
 
-}
+    }
 
-container.appendChild(checkBtn)
 
-}
 
     updateNavigation(currentQuestionIndex, examQuestions.length)
 
 }
 
 
-//=============
-//Show IMMEDIATE FEEDBACK
-//=============
+
+// =======================
+// IMMEDIATE FEEDBACK
+// =======================
 
 function showImmediateFeedback(){
 
-const question = examQuestions[currentQuestionIndex]
+    const existing =
+        document.querySelector(".immediate-feedback")
 
-const userAnswer = userAnswers[currentQuestionIndex]
+    if(existing) existing.remove()
 
-const feedback = document.createElement("div")
+    const question = examQuestions[currentQuestionIndex]
 
-feedback.className = "immediate-feedback"
+    const userAnswer = userAnswers[currentQuestionIndex]
 
-let correctAnswer = question.answer
+    const feedback = document.createElement("div")
 
-feedback.innerHTML = `
+    feedback.className = "immediate-feedback"
 
-<h4>Answer Feedback</h4>
+    feedback.innerHTML = `
 
-<p><strong>Your Answer:</strong> ${
-formatAnswer(userAnswer)
-}</p>
+    <h4>Answer Feedback</h4>
 
-<p><strong>Correct Answer:</strong> ${
-formatAnswer(correctAnswer)
-}</p>
+    <p><strong>Your Answer:</strong> ${formatAnswer(userAnswer)}</p>
 
-<p><strong>Explanation:</strong> ${
-question.explanation
-}</p>
+    <p><strong>Correct Answer:</strong> ${formatAnswer(question.answer)}</p>
 
-`
+    <p><strong>Explanation:</strong> ${question.explanation}</p>
 
-document.getElementById("quiz").appendChild(feedback)
+    `
+
+    document.getElementById("quiz").appendChild(feedback)
 
 }
 
@@ -420,7 +382,9 @@ document.getElementById("quiz").appendChild(feedback)
 // =======================
 
 export function saveAnswer(questionIndex, answer) {
+
     userAnswers[questionIndex] = answer
+
 }
 
 
@@ -429,7 +393,7 @@ export function saveAnswer(questionIndex, answer) {
 // NAVIGATION
 // =======================
 
-export function goToQuestion(index) {
+export function goToQuestion(index){
 
     if (index < 0 || index >= examQuestions.length) return
 
@@ -439,46 +403,58 @@ export function goToQuestion(index) {
 
 }
 
-export function nextQuestion() {
 
-    if (currentQuestionIndex < examQuestions.length - 1) {
+
+export function nextQuestion(){
+
+    if (currentQuestionIndex < examQuestions.length - 1){
+
         currentQuestionIndex++
+
         renderCurrentQuestion()
+
     }
 
 }
 
-export function previousQuestion() {
 
-    if (currentQuestionIndex > 0) {
+
+export function previousQuestion(){
+
+    if (currentQuestionIndex > 0){
+
         currentQuestionIndex--
+
         renderCurrentQuestion()
+
     }
 
 }
 
-//==========================
+
+
+// =======================
 // FLAG TOGGLE
 // =======================
 
 export function toggleFlag(questionIndex){
 
-    if(flaggedQuestions.has(questionIndex)){
+    if(flaggedQuestions.has(questionIndex))
         flaggedQuestions.delete(questionIndex)
-    }
-    else{
+    else
         flaggedQuestions.add(questionIndex)
-    }
 
     updateNavigation(currentQuestionIndex, examQuestions.length)
 
 }
 
+
+
 // =======================
 // SUBMIT EXAM
 // =======================
 
-export function submitExam() {
+export function submitExam(){
 
     clearInterval(timerInterval)
 
@@ -493,31 +469,27 @@ export function submitExam() {
 
         let score = 0
 
-        if (q.type === "ranking") {
+        if (q.type === "ranking"){
 
             maxScore += 20
 
-            if (userAnswer) {
+            if (userAnswer)
                 score = scoreRanking(q.answer, userAnswer)
-            }
 
         }
 
-        if (q.type === "best3") {
+        if (q.type === "best3"){
 
             maxScore += 12
 
-            if (userAnswer) {
+            if (userAnswer)
                 score = scoreBest3(q.answer, userAnswer)
-            }
 
         }
 
         totalScore += score
 
-        if (score === 0) {
-            incorrectQuestions.push(q)
-        }
+        if(score === 0) incorrectQuestions.push(q)
 
     })
 
@@ -540,7 +512,8 @@ function showResults(score, maxScore){
 
     const resultsDiv = document.getElementById("results")
 
-    const examPercent = Math.round((score / maxScore) * 100)
+    const examPercent =
+        Math.round((score / maxScore) * 100)
 
     resultsDiv.innerHTML = `
         <h2>Exam Results</h2>
@@ -555,24 +528,24 @@ function showResults(score, maxScore){
     `
 
 
-    // ANALYTICS
 
     const analytics = calculateAnalytics()
 
-    let analyticsHTML = "<h3>Performance by Competency</h3>"
+    let analyticsHTML =
+        "<h3>Performance by Competency</h3>"
 
     Object.entries(analytics).forEach(([comp,data])=>{
 
-        const competencyPercent =
+        const percent =
             data.max
-            ? Math.round((data.earned / data.max) * 100)
+            ? Math.round((data.earned/data.max)*100)
             : 0
 
         analyticsHTML += `
         <div class="competency-row">
-            <div class="competency-label">${comp} (${competencyPercent}%)</div>
+            <div class="competency-label">${comp} (${percent}%)</div>
             <div class="competency-bar">
-                <div class="competency-fill" style="width:${competencyPercent}%"></div>
+                <div class="competency-fill" style="width:${percent}%"></div>
             </div>
         </div>
         `
@@ -581,7 +554,8 @@ function showResults(score, maxScore){
 
     resultsDiv.innerHTML += analyticsHTML
 
-    document.getElementById("reviewBtn").onclick = showReview
+    document.getElementById("reviewBtn").onclick =
+        showReview
 
 }
 
@@ -598,39 +572,26 @@ function calculateAnalytics(){
     examQuestions.forEach((q,i)=>{
 
         if(!stats[q.competency]){
-            stats[q.competency] = {
-                earned:0,
-                max:0
-            }
+            stats[q.competency] = {earned:0,max:0}
         }
 
         const userAnswer = userAnswers[i]
 
-        let earnedPoints = 0
-        let maxPoints = 0
+        let earned = 0
+        let max = 0
 
         if(q.type === "ranking"){
-
-            maxPoints = 20
-
-            if(userAnswer){
-                earnedPoints = scoreRanking(q.answer,userAnswer)
-            }
-
+            max = 20
+            if(userAnswer) earned = scoreRanking(q.answer,userAnswer)
         }
 
         if(q.type === "best3"){
-
-            maxPoints = 12
-
-            if(userAnswer){
-                earnedPoints = scoreBest3(q.answer,userAnswer)
-            }
-
+            max = 12
+            if(userAnswer) earned = scoreBest3(q.answer,userAnswer)
         }
 
-        stats[q.competency].earned += earnedPoints
-        stats[q.competency].max += maxPoints
+        stats[q.competency].earned += earned
+        stats[q.competency].max += max
 
     })
 
@@ -641,7 +602,7 @@ function calculateAnalytics(){
 
 
 // =======================
-// REVIEW QUESTIONS
+// REVIEW MODE
 // =======================
 
 function showReview(){
@@ -682,13 +643,16 @@ function showReview(){
 
 
 
+// =======================
+// FORMAT ANSWER
+// =======================
+
 function formatAnswer(answer){
 
     if(!answer) return "No answer given"
 
-    if(Array.isArray(answer)){
+    if(Array.isArray(answer))
         return answer.join(", ")
-    }
 
     return answer
 
@@ -708,6 +672,7 @@ export function practiceIncorrect(){
     if(!saved || saved.length === 0){
 
         alert("No incorrect questions saved yet.")
+
         return
 
     }
@@ -730,13 +695,14 @@ export function practiceIncorrect(){
 // GETTERS
 // =======================
 
-export function getExamQuestions() {
+export function getExamQuestions(){
     return examQuestions
 }
 
-export function getUserAnswers() {
+export function getUserAnswers(){
     return userAnswers
 }
 
-
-
+export function getFlaggedQuestions(){
+    return flaggedQuestions
+}
