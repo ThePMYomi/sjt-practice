@@ -113,7 +113,7 @@ export function generateExam(difficulty, numberOfQuestions, questionType, mode){
 
     currentQuestionIndex = 0
 
-    startTimer(numberOfQuestions)
+    startTimer(examQuestions.length)
 
     renderCurrentQuestion()
 
@@ -143,7 +143,7 @@ export function generateCompetencyPractice(
 
     currentQuestionIndex = 0
 
-    startTimer(numberOfQuestions)
+    startTimer(examQuestions.length)
 
     renderCurrentQuestion()
 
@@ -181,17 +181,8 @@ function buildQuestionSet(pool, numberOfQuestions, questionType){
 
     else{
 
-        let rankingCount =
-            Math.round(numberOfQuestions * 0.7)
-
-        let best3Count =
-            numberOfQuestions - rankingCount
-
-        rankingCount =
-            Math.min(rankingCount, rankingPool.length)
-
-        best3Count =
-            Math.min(best3Count, best3Pool.length)
+        let rankingCount = Math.round(numberOfQuestions * 0.7)
+        let best3Count = numberOfQuestions - rankingCount
 
         const rankingQuestions =
             shuffle(rankingPool).slice(0, rankingCount)
@@ -241,7 +232,7 @@ function shuffle(array){
 
 function startTimer(questionCount){
 
-    clearInterval(timerInterval)
+    if(timerInterval) clearInterval(timerInterval)
 
     timeRemaining = Math.round(questionCount * 1.9 * 60)
 
@@ -342,25 +333,17 @@ export function renderCurrentQuestion(){
 
     updateNavigation(currentQuestionIndex, examQuestions.length)
 
-    // =======================
-    // UPDATE NAV BUTTON STATES
-    // =======================
-    
+
+
     const nextBtn = document.getElementById("nextBtn")
     const prevBtn = document.getElementById("prevBtn")
-    
-    // Disable Next on last question
-    if(currentQuestionIndex === examQuestions.length - 1){
-        nextBtn.disabled = true
-    }else{
-        nextBtn.disabled = false
+
+    if(nextBtn){
+        nextBtn.disabled = currentQuestionIndex === examQuestions.length - 1
     }
-    
-    // Disable Previous on first question
-    if(currentQuestionIndex === 0){
-        prevBtn.disabled = true
-    }else{
-        prevBtn.disabled = false
+
+    if(prevBtn){
+        prevBtn.disabled = currentQuestionIndex === 0
     }
 
 }
@@ -699,9 +682,12 @@ function showReview(){
 
 }
 
-//=====================
+
+
+// =======================
 // FORMAT EXPLANATION
-//========================
+// =======================
+
 function formatExplanation(text){
 
     if(!text) return ""
@@ -714,7 +700,7 @@ function formatExplanation(text){
 
         formatted += sentences[i].trim() + " "
 
-        if((i+1) % 2 === 0){
+        if((i+1)%2===0){
             formatted += "<br><br>"
         }
 
@@ -789,5 +775,3 @@ export function getUserAnswers(){
 export function getFlaggedQuestions(){
     return flaggedQuestions
 }
-
-
