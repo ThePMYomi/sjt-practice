@@ -1,11 +1,13 @@
-import { saveAnswer, getUserAnswers } from "../engine/examEngine.js"
+// multiSelectUI.js
 
+import { saveAnswer, getUserAnswers } from "../engine/examEngine.js"
 
 export function renderBest3Question(container, question, questionIndex){
 
     const answers = getUserAnswers()
 
     const savedAnswer = answers[questionIndex] || []
+
 
 
     // =====================
@@ -17,7 +19,6 @@ export function renderBest3Question(container, question, questionIndex){
     scenario.className = "scenario"
 
     scenario.innerHTML = `
-        <h3>Question ${questionIndex + 1}</h3>
         <p>${question.scenario}</p>
         <p><strong>Select the THREE most appropriate actions.</strong></p>
     `
@@ -27,12 +28,12 @@ export function renderBest3Question(container, question, questionIndex){
 
 
     // =====================
-    // OPTIONS CONTAINER
+    // OPTIONS
     // =====================
 
     const optionsDiv = document.createElement("div")
 
-    optionsDiv.className = "options-container"
+    optionsDiv.className = "best3-options"
 
 
 
@@ -40,7 +41,7 @@ export function renderBest3Question(container, question, questionIndex){
 
         const label = document.createElement("label")
 
-        label.className = "option"
+        label.className = "best3-option"
 
 
 
@@ -52,38 +53,19 @@ export function renderBest3Question(container, question, questionIndex){
 
 
 
-        const text = document.createElement("span")
-
-        text.innerHTML = `<strong>${key}</strong> — ${value}`
-
-
-
-        // =====================
-        // RESTORE SAVED ANSWERS
-        // =====================
-
+        // Restore previous answers
         if(savedAnswer.includes(key)){
-
             checkbox.checked = true
-
             label.classList.add("selected-option")
-
         }
 
 
-
-        // =====================
-        // CLICK BEHAVIOUR
-        // =====================
 
         checkbox.addEventListener("change",()=>{
 
             const selected =
                 [...optionsDiv.querySelectorAll("input:checked")]
 
-
-
-            // enforce max 3 selections
             if(selected.length > 3){
 
                 checkbox.checked = false
@@ -103,17 +85,13 @@ export function renderBest3Question(container, question, questionIndex){
 
 
 
-            // =====================
-            // UPDATE VISUAL STATES
-            // =====================
+            // highlight selected
 
-            optionsDiv.querySelectorAll(".option")
+            optionsDiv.querySelectorAll(".best3-option")
             .forEach(opt=>opt.classList.remove("selected-option"))
 
-
-
             selected.forEach(cb=>{
-                cb.closest(".option").classList.add("selected-option")
+                cb.parentElement.classList.add("selected-option")
             })
 
         })
@@ -122,7 +100,7 @@ export function renderBest3Question(container, question, questionIndex){
 
         label.appendChild(checkbox)
 
-        label.appendChild(text)
+        label.innerHTML += `<strong>${key}</strong> — ${value}`
 
         optionsDiv.appendChild(label)
 

@@ -1,3 +1,5 @@
+// navigationUI.js
+
 import {
     goToQuestion,
     getUserAnswers,
@@ -9,15 +11,11 @@ export function updateNavigation(currentIndex, totalQuestions){
 
     const nav = document.getElementById("navigation")
 
-    if(!nav) return
-
     const answers = getUserAnswers()
 
     const flagged = getFlaggedQuestions()
 
     nav.innerHTML = ""
-
-
 
     for(let i = 0; i < totalQuestions; i++){
 
@@ -28,35 +26,31 @@ export function updateNavigation(currentIndex, totalQuestions){
         box.innerText = i + 1
 
 
-
-        const isCurrent = i === currentIndex
-        const isFlagged = flagged.has(i)
-        const isAnswered = answers[i] !== undefined
-
-
-
-        // =====================
-        // PRIORITY ORDER
-        // =====================
-
-        if(isCurrent){
+        // CURRENT QUESTION
+        if(i === currentIndex){
 
             box.classList.add("current")
 
         }
 
-        else if(isFlagged){
+
+        // FLAGGED QUESTION
+        else if(flagged.has(i)){
 
             box.classList.add("flagged")
 
         }
 
-        else if(isAnswered){
+
+        // ANSWERED QUESTION
+        else if(answers[i]){
 
             box.classList.add("answered")
 
         }
 
+
+        // UNANSWERED
         else{
 
             box.classList.add("unanswered")
@@ -64,18 +58,11 @@ export function updateNavigation(currentIndex, totalQuestions){
         }
 
 
-
-        // =====================
-        // CLICK NAVIGATION
-        // =====================
-
-        box.addEventListener("click", () => {
+        box.onclick = () => {
 
             goToQuestion(i)
 
-        })
-
-
+        }
 
         nav.appendChild(box)
 
