@@ -2,7 +2,6 @@
 
 import { saveAnswer, getUserAnswers } from "../engine/examEngine.js"
 
-
 export function renderBest3Question(container, question, questionIndex){
 
     const answers = getUserAnswers()
@@ -11,9 +10,9 @@ export function renderBest3Question(container, question, questionIndex){
 
 
 
-    // =======================
+    // =====================
     // SCENARIO
-    // =======================
+    // =====================
 
     const scenario = document.createElement("div")
 
@@ -28,23 +27,9 @@ export function renderBest3Question(container, question, questionIndex){
 
 
 
-    // =======================
-    // SELECTION COUNTER
-    // =======================
-
-    const counter = document.createElement("div")
-
-    counter.className = "best3-counter"
-
-    counter.innerText = `Selected: ${savedAnswer.length} / 3`
-
-    container.appendChild(counter)
-
-
-
-    // =======================
-    // OPTIONS CONTAINER
-    // =======================
+    // =====================
+    // OPTIONS
+    // =====================
 
     const optionsDiv = document.createElement("div")
 
@@ -68,16 +53,10 @@ export function renderBest3Question(container, question, questionIndex){
 
 
 
-        // =======================
-        // RESTORE PREVIOUS ANSWERS
-        // =======================
-
+        // Restore previous answers
         if(savedAnswer.includes(key)){
-
             checkbox.checked = true
-
             label.classList.add("selected-option")
-
         }
 
 
@@ -86,8 +65,6 @@ export function renderBest3Question(container, question, questionIndex){
 
             const selected =
                 [...optionsDiv.querySelectorAll("input:checked")]
-
-
 
             if(selected.length > 3){
 
@@ -104,23 +81,11 @@ export function renderBest3Question(container, question, questionIndex){
             const answer =
                 selected.map(cb=>cb.value)
 
-
-
             saveAnswer(questionIndex,answer)
 
 
 
-            // =======================
-            // UPDATE COUNTER
-            // =======================
-
-            counter.innerText = `Selected: ${answer.length} / 3`
-
-
-
-            // =======================
-            // VISUAL HIGHLIGHT
-            // =======================
+            // highlight selected
 
             optionsDiv.querySelectorAll(".best3-option")
             .forEach(opt=>opt.classList.remove("selected-option"))
