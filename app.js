@@ -1,5 +1,3 @@
-// app.js
-
 import {
     loadQuestionBank,
     generateExam,
@@ -24,56 +22,67 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("App ready")
 
 
+    let examInProgress = false
+
+
     // =======================
     // START EXAM
     // =======================
 
     const startBtn = document.getElementById("startBtn")
 
-    startBtn.addEventListener("click", () => {
+    if(startBtn){
 
-        const difficulty =
-            document.getElementById("difficulty").value
+        startBtn.addEventListener("click", () => {
 
-        const questionCount =
-            parseInt(document.getElementById("questionCount").value)
+            const difficulty =
+                document.getElementById("difficulty")?.value || "all"
 
-        const practiceMode =
-            document.getElementById("practiceMode").value
+            const questionCount =
+                parseInt(document.getElementById("questionCount")?.value || 10)
 
-        const competency =
-            document.getElementById("competency").value
+            const practiceMode =
+                document.getElementById("practiceMode")?.value || "exam"
 
-        const questionType =
-            document.getElementById("questionType").value
+            const competency =
+                document.getElementById("competency")?.value || "all"
 
-
-        // hide start screen
-        document.getElementById("startMenu").style.display = "none"
+            const questionType =
+                document.getElementById("questionType")?.value || "both"
 
 
-        if (competency === "all") {
+            // hide start screen
+            const startMenu = document.getElementById("startMenu")
+            if(startMenu) startMenu.style.display = "none"
 
-            generateExam(
-                difficulty,
-                questionCount,
-                questionType,
-                practiceMode
-            )
 
-        }
-        else {
+            examInProgress = true
 
-            generateCompetencyPractice(
-                competency,
-                questionCount,
-                questionType,
-                practiceMode
-            )
 
-        }
+            if (competency === "all") {
 
-    })
+                generateExam(
+                    difficulty,
+                    questionCount,
+                    questionType,
+                    practiceMode
+                )
+
+            }
+            else {
+
+                generateCompetencyPractice(
+                    competency,
+                    questionCount,
+                    questionType,
+                    practiceMode
+                )
+
+            }
+
+        })
+
+    }
 
 
     // =======================
@@ -82,16 +91,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const prevBtn = document.getElementById("prevBtn")
 
-    prevBtn.addEventListener("click", () => {
-        previousQuestion()
-    })
+    if(prevBtn){
+        prevBtn.addEventListener("click", () => {
+            previousQuestion()
+        })
+    }
 
 
     const nextBtn = document.getElementById("nextBtn")
 
-    nextBtn.addEventListener("click", () => {
-        nextQuestion()
-    })
+    if(nextBtn){
+        nextBtn.addEventListener("click", () => {
+            nextQuestion()
+        })
+    }
 
 
     // =======================
@@ -104,7 +117,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         incorrectBtn.addEventListener("click", () => {
 
-            document.getElementById("startMenu").style.display = "none"
+            const startMenu = document.getElementById("startMenu")
+            if(startMenu) startMenu.style.display = "none"
+
+            examInProgress = true
 
             practiceIncorrect()
 
@@ -113,55 +129,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-// =======================
-// SUBMIT EXAM
-// =======================
+    // =======================
+    // SUBMIT EXAM
+    // =======================
 
-const submitBtn = document.getElementById("submitBtn")
+    const submitBtn = document.getElementById("submitBtn")
 
-submitBtn.addEventListener("click", () => {
+    if(submitBtn){
 
-    const confirmSubmit = confirm(
-        "Are you sure you want to submit the exam?"
-    )
+        submitBtn.addEventListener("click", () => {
 
-    if(confirmSubmit){
+            const confirmSubmit = confirm(
+                "Are you sure you want to submit the exam?"
+            )
 
-        submitExam()
+            if(confirmSubmit){
+
+                examInProgress = false
+
+                submitExam()
+
+            }
+
+        })
 
     }
 
-})
 
-// =======================
-// PREVENT ACCIDENTAL REFRESH
-// =======================
+    // =======================
+    // PREVENT ACCIDENTAL REFRESH
+    // =======================
 
-let examInProgress = false
+    window.addEventListener("beforeunload", function (e) {
 
-// mark exam started
-document.getElementById("startBtn").addEventListener("click", () => {
-    examInProgress = true
-})
+        if(!examInProgress) return
 
-// mark exam finished
-document.getElementById("submitBtn").addEventListener("click", () => {
-    examInProgress = false
-})
+        e.preventDefault()
 
-window.addEventListener("beforeunload", function (e) {
+        e.returnValue = ""
 
-    if(!examInProgress) return
-
-    e.preventDefault()
-
-    e.returnValue = ""
+    })
 
 })
-    
-})
-
-
-
-
-
