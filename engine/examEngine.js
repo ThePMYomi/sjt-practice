@@ -1,5 +1,3 @@
-// examEngine.js
-
 import { scoreRanking, scoreBest3 } from "./scoringEngine.js"
 import { renderRankingQuestion } from "../ui/rankingUI.js"
 import { renderBest3Question } from "../ui/multiSelectUI.js"
@@ -42,6 +40,35 @@ let currentQuestionIndex = 0
 
 let timerInterval = null
 let timeRemaining = 0
+
+
+
+// =======================
+// TEXT FORMATTER
+// Adds spacing after every 2 sentences
+// =======================
+
+function formatTextSpacing(text){
+
+    if(!text) return ""
+
+    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text]
+
+    let formatted = ""
+
+    for(let i = 0; i < sentences.length; i++){
+
+        formatted += sentences[i].trim() + " "
+
+        if((i + 1) % 2 === 0){
+            formatted += "<br><br>"
+        }
+
+    }
+
+    return formatted
+
+}
 
 
 
@@ -113,6 +140,11 @@ export function generateExam(difficulty, numberOfQuestions, questionType, mode){
 
     currentQuestionIndex = 0
 
+    if(examQuestions.length === 0){
+        alert("No questions available.")
+        return
+    }
+
     startTimer(examQuestions.length)
 
     renderCurrentQuestion()
@@ -143,6 +175,11 @@ export function generateCompetencyPractice(
 
     currentQuestionIndex = 0
 
+    if(examQuestions.length === 0){
+        alert("No questions available for this competency.")
+        return
+    }
+
     startTimer(examQuestions.length)
 
     renderCurrentQuestion()
@@ -170,32 +207,52 @@ function buildQuestionSet(pool, numberOfQuestions, questionType){
         examQuestions =
             shuffle(rankingPool).slice(0, numberOfQuestions)
 
+        return
     }
 
-    else if(questionType === "best3"){
+    if(questionType === "best3"){
 
         examQuestions =
             shuffle(best3Pool).slice(0, numberOfQuestions)
 
+        return
     }
 
-    else{
+    // BOTH TYPES
 
-        let rankingCount = Math.round(numberOfQuestions * 0.7)
-        let best3Count = numberOfQuestions - rankingCount
+    let rankingCount = Math.round(numberOfQuestions * 0.7)
+    let best3Count = numberOfQuestions - rankingCount
 
-        const rankingQuestions =
-            shuffle(rankingPool).slice(0, rankingCount)
+    rankingCount = Math.min(rankingCount, rankingPool.length)
+    best3Count = Math.min(best3Count, best3Pool.length)
 
-        const best3Questions =
-            shuffle(best3Pool).slice(0, best3Count)
+    let remaining = numberOfQuestions - (rankingCount + best3Count)
 
-        examQuestions = [
-            ...rankingQuestions,
-            ...best3Questions
-        ]
+    while(remaining > 0){
 
+        if(rankingPool.length > rankingCount){
+            rankingCount++
+        }
+        else if(best3Pool.length > best3Count){
+            best3Count++
+        }
+        else{
+            break
+        }
+
+        remaining--
     }
+
+    const rankingQuestions =
+        shuffle(rankingPool).slice(0, rankingCount)
+
+    const best3Questions =
+        shuffle(best3Pool).slice(0, best3Count)
+
+    examQuestions = shuffle([
+        ...rankingQuestions,
+        ...best3Questions
+    ])
 
 }
 
@@ -233,6 +290,8 @@ function shuffle(array){
 function startTimer(questionCount){
 
     if(timerInterval) clearInterval(timerInterval)
+
+    if(questionCount === 0) return
 
     timeRemaining = Math.round(questionCount * 1.9 * 60)
 
@@ -273,7 +332,6 @@ export function renderCurrentQuestion(){
     container.innerHTML = ""
 
 
-
     const header = document.createElement("div")
     header.className = "question-header"
 
@@ -281,7 +339,6 @@ export function renderCurrentQuestion(){
     `<h3>Question ${currentQuestionIndex+1} of ${examQuestions.length}</h3>`
 
     container.appendChild(header)
-
 
 
     const flagBtn = document.createElement("button")
@@ -302,6 +359,11 @@ export function renderCurrentQuestion(){
     }
 
     header.appendChild(flagBtn)
+
+
+
+    // FORMAT SCENARIO TEXT
+    question.scenario = formatTextSpacing(question.scenario)
 
 
 
@@ -339,11 +401,13 @@ export function renderCurrentQuestion(){
     const prevBtn = document.getElementById("prevBtn")
 
     if(nextBtn){
-        nextBtn.disabled = currentQuestionIndex === examQuestions.length - 1
+        nextBtn.disabled =
+            currentQuestionIndex === examQuestions.length - 1
     }
 
     if(prevBtn){
-        prevBtn.disabled = currentQuestionIndex === 0
+        prevBtn.disabled =
+            currentQuestionIndex === 0
     }
 
 }
@@ -365,6 +429,11 @@ function showImmediateFeedback(){
 
     const userAnswer = userAnswers[currentQuestionIndex]
 
+    if(!userAnswer){
+        alert("Please answer the question before checking.")
+        return
+    }
+
     const feedback = document.createElement("div")
 
     feedback.className = "immediate-feedback"
@@ -376,7 +445,7 @@ function showImmediateFeedback(){
 
     <p><strong>Correct Answer:</strong> ${formatAnswer(question.answer)}</p>
 
-    <p><strong>Explanation:</strong><br>${formatExplanation(question.explanation)}</p>
+    <p><strong>Explanation:</strong><br>${formatTextSpacing(question.explanation)}</p>
     `
 
 
@@ -525,188 +594,6 @@ export function submitExam(){
 
 
     showResults(totalScore,maxScore)
-
-}
-
-
-
-// =======================
-// SHOW RESULTS
-// =======================
-
-function showResults(score,maxScore){
-
-    const resultsDiv = document.getElementById("results")
-
-    const examPercent =
-        Math.round((score/maxScore)*100)
-
-    resultsDiv.innerHTML = `
-        <h2>Exam Results</h2>
-
-        <p><strong>Score:</strong> ${score} / ${maxScore}</p>
-
-        <p><strong>Percentage:</strong> ${examPercent}%</p>
-
-        <button id="reviewBtn">Review Questions</button>
-
-        <button onclick="location.reload()">Start New Practice</button>
-    `
-
-
-
-    const analytics = calculateAnalytics()
-
-    let analyticsHTML =
-        "<h3>Performance by Competency</h3>"
-
-    Object.entries(analytics).forEach(([comp,data])=>{
-
-        const percent =
-            data.max
-            ? Math.round((data.earned/data.max)*100)
-            : 0
-
-        analyticsHTML += `
-        <div class="competency-row">
-            <div class="competency-label">${comp} (${percent}%)</div>
-            <div class="competency-bar">
-                <div class="competency-fill" style="width:${percent}%"></div>
-            </div>
-        </div>
-        `
-
-    })
-
-    resultsDiv.innerHTML += analyticsHTML
-
-    document.getElementById("reviewBtn").onclick =
-        showReview
-
-}
-
-
-
-// =======================
-// ANALYTICS
-// =======================
-
-function calculateAnalytics(){
-
-    let stats = {}
-
-    examQuestions.forEach((q,i)=>{
-
-        if(!stats[q.competency]){
-            stats[q.competency] = {earned:0,max:0}
-        }
-
-        const userAnswer = userAnswers[i]
-
-        let earned = 0
-        let max = 0
-
-        if(q.type === "ranking"){
-            max = 20
-            if(userAnswer) earned = scoreRanking(q.answer,userAnswer)
-        }
-
-        if(q.type === "best3"){
-            max = 12
-            if(userAnswer) earned = scoreBest3(q.answer,userAnswer)
-        }
-
-        stats[q.competency].earned += earned
-        stats[q.competency].max += max
-
-    })
-
-    return stats
-
-}
-
-
-
-// =======================
-// REVIEW MODE
-// =======================
-
-function showReview(){
-
-    const quiz = document.getElementById("quiz")
-
-    quiz.innerHTML = "<h2>Review Questions</h2>"
-
-    examQuestions.forEach((q,i)=>{
-
-        const userAnswer = userAnswers[i]
-
-        let html = `<div class="review-question">`
-
-        html += `<p><strong>Scenario:</strong> ${q.scenario}</p>`
-
-        html += `<p><strong>Options:</strong></p><ul>`
-
-        Object.entries(q.options).forEach(([key,val])=>{
-            html += `<li><b>${key}</b> — ${val}</li>`
-        })
-
-        html += `</ul>`
-
-        html += `<p><strong>Your Answer:</strong> ${formatAnswer(userAnswer)}</p>`
-
-        html += `<p><strong>Correct Answer:</strong> ${formatAnswer(q.answer)}</p>`
-
-        html += `<p class="explanation"><strong>Explanation:</strong><br>${formatExplanation(q.explanation)}</p>`
-
-
-
-        if(q.learningPoints){
-
-            html += `
-            <div class="learning-points">
-                <p><strong>Key Learning Points</strong></p>
-                <ul>
-                    ${q.learningPoints.map(p=>`<li>${p}</li>`).join("")}
-                </ul>
-            </div>
-            `
-
-        }
-
-        html += `</div>`
-
-        quiz.innerHTML += html
-
-    })
-
-}
-
-
-
-// =======================
-// FORMAT EXPLANATION
-// =======================
-
-function formatExplanation(text){
-
-    if(!text) return ""
-
-    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text]
-
-    let formatted = ""
-
-    for(let i=0;i<sentences.length;i++){
-
-        formatted += sentences[i].trim() + " "
-
-        if((i+1)%2===0){
-            formatted += "<br><br>"
-        }
-
-    }
-
-    return formatted
 
 }
 
