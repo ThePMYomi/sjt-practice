@@ -113,15 +113,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    // =======================
-    // SUBMIT EXAM
-    // =======================
+// =======================
+// SUBMIT EXAM
+// =======================
 
-    const submitBtn = document.getElementById("submitBtn")
+const submitBtn = document.getElementById("submitBtn")
 
 submitBtn.addEventListener("click", () => {
 
-    showReviewScreen()
+    const confirmSubmit = confirm(
+        "Are you sure you want to submit the exam?"
+    )
+
+    if(confirmSubmit){
+
+        submitExam()
+
+    }
 
 })
 
@@ -152,6 +160,7 @@ window.addEventListener("beforeunload", function (e) {
 })
     
 })
+
 
 
 
