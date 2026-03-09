@@ -1,16 +1,25 @@
 // multiSelectUI.js
 
-import { saveAnswer } from "../engine/examEngine.js"
+import { saveAnswer, getUserAnswers } from "../engine/examEngine.js"
 
 
 export function renderBest3Question(container, question, questionIndex){
+
+    const answers = getUserAnswers()
+
+    const savedAnswer = answers[questionIndex] || []
+
+
+
+    // =======================
+    // SCENARIO
+    // =======================
 
     const scenario = document.createElement("div")
 
     scenario.className = "scenario"
 
     scenario.innerHTML = `
-        <h3>Question ${questionIndex + 1}</h3>
         <p>${question.scenario}</p>
         <p><strong>Select the THREE most appropriate actions.</strong></p>
     `
@@ -19,48 +28,70 @@ export function renderBest3Question(container, question, questionIndex){
 
 
 
-    const optionsContainer = document.createElement("div")
+    // =======================
+    // SELECTION COUNTER
+    // =======================
 
-    optionsContainer.className = "options-container"
+    const counter = document.createElement("div")
+
+    counter.className = "best3-counter"
+
+    counter.innerText = `Selected: ${savedAnswer.length} / 3`
+
+    container.appendChild(counter)
+
+
+
+    // =======================
+    // OPTIONS CONTAINER
+    // =======================
+
+    const optionsDiv = document.createElement("div")
+
+    optionsDiv.className = "best3-options"
 
 
 
     Object.entries(question.options).forEach(([key,value])=>{
 
-        const option = document.createElement("label")
+        const label = document.createElement("label")
 
-        option.className = "option"
-
-        option.innerHTML = `
-            <input type="checkbox" value="${key}" name="q${questionIndex}">
-            <span class="option-label">${key}</span>
-            <span class="option-text">${value}</span>
-        `
-
-        optionsContainer.appendChild(option)
-
-    })
+        label.className = "best3-option"
 
 
 
-    container.appendChild(optionsContainer)
+        const checkbox = document.createElement("input")
+
+        checkbox.type = "checkbox"
+
+        checkbox.value = key
 
 
 
-    const checkboxes = optionsContainer.querySelectorAll("input[type=checkbox]")
+        // =======================
+        // RESTORE PREVIOUS ANSWERS
+        // =======================
+
+        if(savedAnswer.includes(key)){
+
+            checkbox.checked = true
+
+            label.classList.add("selected-option")
+
+        }
 
 
 
-    checkboxes.forEach(cb => {
+        checkbox.addEventListener("change",()=>{
 
-        cb.addEventListener("change",()=>{
+            const selected =
+                [...optionsDiv.querySelectorAll("input:checked")]
 
-            const selected = getSelected(checkboxes)
 
-            // enforce max 3 selections
+
             if(selected.length > 3){
 
-                cb.checked = false
+                checkbox.checked = false
 
                 alert("You may only select THREE options.")
 
@@ -68,30 +99,50 @@ export function renderBest3Question(container, question, questionIndex){
 
             }
 
-            saveAnswer(questionIndex, selected)
+
+
+            const answer =
+                selected.map(cb=>cb.value)
+
+
+
+            saveAnswer(questionIndex,answer)
+
+
+
+            // =======================
+            // UPDATE COUNTER
+            // =======================
+
+            counter.innerText = `Selected: ${answer.length} / 3`
+
+
+
+            // =======================
+            // VISUAL HIGHLIGHT
+            // =======================
+
+            optionsDiv.querySelectorAll(".best3-option")
+            .forEach(opt=>opt.classList.remove("selected-option"))
+
+            selected.forEach(cb=>{
+                cb.parentElement.classList.add("selected-option")
+            })
 
         })
 
-    })
-
-}
 
 
+        label.appendChild(checkbox)
 
-function getSelected(checkboxes){
+        label.innerHTML += `<strong>${key}</strong> — ${value}`
 
-    const selected = []
-
-    checkboxes.forEach(cb => {
-
-        if(cb.checked){
-
-            selected.push(cb.value)
-
-        }
+        optionsDiv.appendChild(label)
 
     })
 
-    return selected
+
+
+    container.appendChild(optionsDiv)
 
 }
