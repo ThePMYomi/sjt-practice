@@ -125,7 +125,34 @@ submitBtn.addEventListener("click", () => {
 
 })
 
+// =======================
+// PREVENT ACCIDENTAL REFRESH
+// =======================
+
+let examInProgress = false
+
+// mark exam started
+document.getElementById("startBtn").addEventListener("click", () => {
+    examInProgress = true
 })
+
+// mark exam finished
+document.getElementById("submitBtn").addEventListener("click", () => {
+    examInProgress = false
+})
+
+window.addEventListener("beforeunload", function (e) {
+
+    if(!examInProgress) return
+
+    e.preventDefault()
+
+    e.returnValue = ""
+
+})
+    
+})
+
 
 
 
