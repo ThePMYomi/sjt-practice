@@ -1,9 +1,16 @@
-// rankingUI.js
-
 import { saveAnswer, getUserAnswers } from "../engine/examEngine.js"
 
 
 export function renderRankingQuestion(container, question, questionIndex){
+
+    const answers = getUserAnswers()
+
+    const savedRanking = answers[questionIndex]
+
+
+    // ==========================
+    // SCENARIO
+    // ==========================
 
     const scenario = document.createElement("div")
 
@@ -19,9 +26,11 @@ export function renderRankingQuestion(container, question, questionIndex){
 
 
 
-    const list = document.createElement("ul")
+    // ==========================
+    // RANKING LIST
+    // ==========================
 
-    list.id = "rankingList"
+    const list = document.createElement("ul")
 
     list.className = "ranking-list"
 
@@ -31,18 +40,19 @@ export function renderRankingQuestion(container, question, questionIndex){
     // RESTORE SAVED ORDER
     // ==========================
 
-    const savedAnswers = getUserAnswers()
-
-    const savedRanking = savedAnswers[questionIndex]
-
     let optionsOrder
 
     if(savedRanking && Array.isArray(savedRanking)){
+
         optionsOrder = savedRanking
+
         list.classList.add("ranking-answered")
+
     }
     else{
+
         optionsOrder = Object.keys(question.options)
+
     }
 
 
@@ -76,6 +86,10 @@ export function renderRankingQuestion(container, question, questionIndex){
 
 
 
+    // ==========================
+    // INSTRUCTION TEXT
+    // ==========================
+
     const instruction = document.createElement("p")
 
     instruction.className = "ranking-instruction"
@@ -87,12 +101,28 @@ export function renderRankingQuestion(container, question, questionIndex){
 
 
     // ==========================
+    // NOTICE CONTAINER
+    // ==========================
+
+    const notice = document.createElement("div")
+
+    notice.className = "ranking-notice"
+
+    notice.style.display = "none"
+
+    container.appendChild(notice)
+
+
+
+    // ==========================
     // DRAG AND DROP
     // ==========================
 
     new Sortable(list,{
 
         animation:150,
+
+        ghostClass:"ranking-ghost",
 
         onEnd:function(){
 
@@ -101,20 +131,22 @@ export function renderRankingQuestion(container, question, questionIndex){
             saveAnswer(questionIndex,answer)
 
 
-            // mark question visually answered
+            // mark visually answered
             list.classList.add("ranking-answered")
 
 
-            // highlight reorder animation
+            // animation highlight
             list.classList.add("ranking-changed")
 
             setTimeout(()=>{
+
                 list.classList.remove("ranking-changed")
+
             },600)
 
 
-            // show confirmation notice
-            showRankingNotice(list)
+            // show update notice
+            showRankingNotice(notice)
 
         }
 
@@ -135,7 +167,9 @@ function getCurrentRanking(list){
     const ranking = []
 
     items.forEach(item=>{
+
         ranking.push(item.dataset.option)
+
     })
 
     return ranking
@@ -145,28 +179,19 @@ function getCurrentRanking(list){
 
 
 // =======================
-// SHOW "ORDER UPDATED"
+// SHOW NOTICE
 // =======================
 
-function showRankingNotice(list){
-
-    const existingNotice =
-        list.querySelector(".ranking-notice")
-
-    if(existingNotice){
-        existingNotice.remove()
-    }
-
-    const notice = document.createElement("div")
-
-    notice.className = "ranking-notice"
+function showRankingNotice(notice){
 
     notice.innerText = "Order updated ✓"
 
-    list.prepend(notice)
+    notice.style.display = "block"
 
     setTimeout(()=>{
-        notice.remove()
-    },1000)
+
+        notice.style.display = "none"
+
+    },1200)
 
 }
