@@ -48,26 +48,29 @@ let timeRemaining = 0
 // Adds spacing after every 2 sentences
 // =======================
 
-function formatTextSpacing(text){
+function formatReadableText(text){
 
     if(!text) return ""
 
-    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text]
+    const sentences =
+        text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text]
 
     let formatted = ""
 
     for(let i = 0; i < sentences.length; i++){
 
-        formatted += sentences[i].trim() + " "
+        formatted += sentences[i].trim()
 
         if((i + 1) % 2 === 0){
             formatted += "<br><br>"
+        }
+        else{
+            formatted += " "
         }
 
     }
 
     return formatted
-
 }
 
 
@@ -218,8 +221,6 @@ function buildQuestionSet(pool, numberOfQuestions, questionType){
         return
     }
 
-    // BOTH TYPES
-
     let rankingCount = Math.round(numberOfQuestions * 0.7)
     let best3Count = numberOfQuestions - rankingCount
 
@@ -327,6 +328,9 @@ export function renderCurrentQuestion(){
 
     const question = examQuestions[currentQuestionIndex]
 
+    const formattedScenario =
+        formatReadableText(question.scenario)
+
     const container = document.getElementById("quiz")
 
     container.innerHTML = ""
@@ -362,17 +366,24 @@ export function renderCurrentQuestion(){
 
 
 
-    // FORMAT SCENARIO TEXT
-    question.scenario = formatTextSpacing(question.scenario)
-
-
-
     if(question.type === "ranking"){
-        renderRankingQuestion(container, question, currentQuestionIndex)
+
+        renderRankingQuestion(
+            container,
+            {...question, scenario: formattedScenario},
+            currentQuestionIndex
+        )
+
     }
 
     else if(question.type === "best3"){
-        renderBest3Question(container, question, currentQuestionIndex)
+
+        renderBest3Question(
+            container,
+            {...question, scenario: formattedScenario},
+            currentQuestionIndex
+        )
+
     }
 
 
@@ -445,22 +456,8 @@ function showImmediateFeedback(){
 
     <p><strong>Correct Answer:</strong> ${formatAnswer(question.answer)}</p>
 
-    <p><strong>Explanation:</strong><br>${formatTextSpacing(question.explanation)}</p>
+    <p><strong>Explanation:</strong><br>${formatReadableText(question.explanation)}</p>
     `
-
-
-
-    if(question.learningPoints){
-
-        feedback.innerHTML += `
-        <div class="learning-points">
-            <p><strong>Key Learning Points</strong></p>
-            <ul>
-                ${question.learningPoints.map(p=>`<li>${p}</li>`).join("")}
-            </ul>
-        </div>
-        `
-    }
 
     document.getElementById("quiz").appendChild(feedback)
 
@@ -595,6 +592,30 @@ export function submitExam(){
 
     showResults(totalScore,maxScore)
 
+}
+
+
+
+// =======================
+// SHOW RESULTS
+// =======================
+
+function showResults(score,maxScore){
+
+    const resultsDiv = document.getElementById("results")
+
+    const examPercent =
+        Math.round((score/maxScore)*100)
+
+    resultsDiv.innerHTML = `
+        <h2>Exam Results</h2>
+
+        <p><strong>Score:</strong> ${score} / ${maxScore}</p>
+
+        <p><strong>Percentage:</strong> ${examPercent}%</p>
+
+        <button onclick="location.reload()">Start New Practice</button>
+    `
 }
 
 
