@@ -1,11 +1,14 @@
+// scoringEngine.js
+
+
 // =======================
 // RANKING QUESTION SCORING
 // =======================
 
-// Correct example:
+// Correct answer example:
 // ["A","C","E","D","B"]
 
-// User example:
+// User answer example:
 // ["A","E","C","D","B"]
 
 // Distance scoring:
@@ -13,13 +16,10 @@
 // distance 1 = 3
 // distance 2 = 2
 // distance 3 = 1
-// distance 4+ = 0
+// distance 4 = 0
+
 
 export function scoreRanking(correctOrder, userOrder){
-
-    if(!Array.isArray(correctOrder) || !Array.isArray(userOrder)){
-        return 0
-    }
 
     let score = 0
 
@@ -47,26 +47,26 @@ export function scoreRanking(correctOrder, userOrder){
 // BEST-3 QUESTION SCORING
 // =======================
 
-// Correct example:
+// correct answers example:
 // ["A","C","F"]
 
-// User example:
+// user answers example:
 // ["A","F","D"]
 
-// Each correct answer = 4 marks
+// scoring:
+// each correct = 4 marks
+
 
 export function scoreBest3(correctAnswers, userAnswers){
-
-    if(!Array.isArray(correctAnswers) || !Array.isArray(userAnswers)){
-        return 0
-    }
 
     let score = 0
 
     userAnswers.forEach(answer => {
 
         if(correctAnswers.includes(answer)){
+
             score += 4
+
         }
 
     })
@@ -90,39 +90,29 @@ export function calculateTotalScore(examQuestions, userAnswers){
 
         const answer = userAnswers[i]
 
+        if(!answer) return
+
         if(q.type === "ranking"){
 
+            totalScore += scoreRanking(q.answer, answer)
             maxScore += 20
-
-            if(answer){
-                totalScore += scoreRanking(q.answer, answer)
-            }
 
         }
 
         if(q.type === "best3"){
 
+            totalScore += scoreBest3(q.answer, answer)
             maxScore += 12
-
-            if(answer){
-                totalScore += scoreBest3(q.answer, answer)
-            }
 
         }
 
     })
 
-    let percentage = 0
-
-    if(maxScore > 0){
-        percentage = Math.round((totalScore / maxScore) * 100)
-    }
-
     return {
 
         score: totalScore,
         maxScore: maxScore,
-        percentage: percentage
+        percentage: Math.round((totalScore / maxScore) * 100)
 
     }
 
