@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("App ready")
 
 
+
     // =======================
     // START EXAM
     // =======================
@@ -48,8 +49,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById("questionType").value
 
 
-        // hide start screen
+
         document.getElementById("startMenu").style.display = "none"
+
 
 
         if (competency === "all") {
@@ -76,6 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
 
 
+
     // =======================
     // NAVIGATION BUTTONS
     // =======================
@@ -87,11 +90,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
 
 
+
     const nextBtn = document.getElementById("nextBtn")
 
     nextBtn.addEventListener("click", () => {
         nextQuestion()
     })
+
 
 
     // =======================
@@ -113,55 +118,57 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-// =======================
-// SUBMIT EXAM
-// =======================
 
-const submitBtn = document.getElementById("submitBtn")
+    // =======================
+    // SUBMIT EXAM
+    // =======================
 
-submitBtn.addEventListener("click", () => {
+    const submitBtn = document.getElementById("submitBtn")
 
-    const confirmSubmit = confirm(
-        "Are you sure you want to submit the exam?"
-    )
+    submitBtn.addEventListener("click", () => {
 
-    if(confirmSubmit){
+        const confirmSubmit = confirm(
+            "Are you sure you want to submit the exam?"
+        )
 
-        submitExam()
+        if(confirmSubmit){
 
-    }
+            submitExam()
+
+        }
+
+    })
+
+
+
+    // =======================
+    // PREVENT ACCIDENTAL REFRESH
+    // =======================
+
+    let examInProgress = false
+
+
+
+    startBtn.addEventListener("click", () => {
+        examInProgress = true
+    })
+
+
+
+    submitBtn.addEventListener("click", () => {
+        examInProgress = false
+    })
+
+
+
+    window.addEventListener("beforeunload", function (e) {
+
+        if(!examInProgress) return
+
+        e.preventDefault()
+
+        e.returnValue = ""
+
+    })
 
 })
-
-// =======================
-// PREVENT ACCIDENTAL REFRESH
-// =======================
-
-let examInProgress = false
-
-// mark exam started
-document.getElementById("startBtn").addEventListener("click", () => {
-    examInProgress = true
-})
-
-// mark exam finished
-document.getElementById("submitBtn").addEventListener("click", () => {
-    examInProgress = false
-})
-
-window.addEventListener("beforeunload", function (e) {
-
-    if(!examInProgress) return
-
-    e.preventDefault()
-
-    e.returnValue = ""
-
-})
-    
-})
-
-
-
-
-
