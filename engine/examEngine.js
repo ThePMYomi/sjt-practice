@@ -342,6 +342,27 @@ export function renderCurrentQuestion(){
 
     updateNavigation(currentQuestionIndex, examQuestions.length)
 
+    // =======================
+    // UPDATE NAV BUTTON STATES
+    // =======================
+    
+    const nextBtn = document.getElementById("nextBtn")
+    const prevBtn = document.getElementById("prevBtn")
+    
+    // Disable Next on last question
+    if(currentQuestionIndex === examQuestions.length - 1){
+        nextBtn.disabled = true
+    }else{
+        nextBtn.disabled = false
+    }
+    
+    // Disable Previous on first question
+    if(currentQuestionIndex === 0){
+        prevBtn.disabled = true
+    }else{
+        prevBtn.disabled = false
+    }
+
 }
 
 
@@ -768,4 +789,5 @@ export function getUserAnswers(){
 export function getFlaggedQuestions(){
     return flaggedQuestions
 }
+
 
