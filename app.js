@@ -9,7 +9,8 @@ import {
     submitExam,
     practiceIncorrect
 } from "./engine/examEngine.js"
-
+import { showHistory } from "./ui/historyUI.js"
+import { generateWeakAreaPractice } from "./engine/examEngine.js"
 
 // =======================
 // INITIALISE APP
@@ -133,6 +134,42 @@ submitBtn.addEventListener("click", () => {
 
 })
 
+
+// ========================
+// Load History Page    
+// ======================    
+const historyBtn = document.getElementById("historyBtn")
+
+if(historyBtn){
+
+    historyBtn.addEventListener("click",()=>{
+
+        document.getElementById("startMenu").style.display = "none"
+
+        showHistory()
+
+    })
+
+}
+
+//==============================
+//LOAD WEAK AREAS
+//=========================
+const weakBtn =
+    document.getElementById("weakPracticeBtn")
+
+if(weakBtn){
+
+    weakBtn.addEventListener("click",()=>{
+
+        document.getElementById("startMenu").style.display = "none"
+
+        generateWeakAreaPractice()
+
+    })
+
+}
+    
 // =======================
 // PREVENT ACCIDENTAL REFRESH
 // =======================
@@ -160,8 +197,3 @@ window.addEventListener("beforeunload", function (e) {
 })
     
 })
-
-
-
-
-
