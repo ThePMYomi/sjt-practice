@@ -470,6 +470,36 @@ export function toggleFlag(questionIndex){
 
 }
 
+// ===========================
+// SAVE EXAM ATTEMPT
+// =======================
+
+function saveExamAttempt(score,maxScore){
+
+    const history =
+        JSON.parse(localStorage.getItem("examHistory")) || []
+
+    const attempt = {
+
+        id: "exam_" + Date.now(),
+        date: new Date().toISOString(),
+
+        score: score,
+        maxScore: maxScore,
+        percent: Math.round((score/maxScore)*100),
+
+        questions: examQuestions,
+        userAnswers: userAnswers
+
+    }
+
+    history.push(attempt)
+
+    localStorage.setItem(
+        "examHistory",
+        JSON.stringify(history)
+    )
+}
 
 
 // =======================
@@ -523,6 +553,8 @@ export function submitExam(){
     )
 
 
+
+    saveExamAttempt(totalScore,maxScore)
 
     showResults(totalScore,maxScore)
 
@@ -775,3 +807,82 @@ export function getUserAnswers(){
 export function getFlaggedQuestions(){
     return flaggedQuestions
 }
+
+
+//==========================
+// PRACTICE WEAK AREAS
+//===============
+
+
+export function generateWeakAreaPractice(){
+
+    const history =
+        JSON.parse(localStorage.getItem("examHistory")) || []
+
+    if(history.length === 0){
+
+        alert("Complete some practice tests first.")
+
+        return
+    }
+
+    const stats = {}
+
+    history.forEach(exam=>{
+
+        exam.questions.forEach((q,i)=>{
+
+            if(!stats[q.competency]){
+                stats[q.competency] = {correct:0,total:0}
+            }
+
+            const userAnswer = exam.userAnswers[i]
+
+            if(userAnswer){
+
+                const correctAnswer = q.answer
+
+                if(JSON.stringify(userAnswer) === JSON.stringify(correctAnswer)){
+                    stats[q.competency].correct++
+                }
+
+                stats[q.competency].total++
+            }
+
+        })
+
+    })
+
+    let weakest = null
+    let lowestScore = 100
+
+    Object.entries(stats).forEach(([comp,data])=>{
+
+        const percent =
+            (data.correct/data.total)*100
+
+        if(percent < lowestScore){
+
+            lowestScore = percent
+            weakest = comp
+
+        }
+
+    })
+
+    if(!weakest){
+
+        alert("No weak competencies detected yet.")
+
+        return
+    }
+
+    generateCompetencyPractice(
+        weakest,
+        20,
+        "both",
+        "learn"
+    )
+
+}
+
