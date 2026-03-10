@@ -1,4 +1,3 @@
-```javascript
 import { saveAnswer, getUserAnswers } from "../engine/examEngine.js"
 
 export function renderBest3Question(container, question, questionIndex){
@@ -94,4 +93,4 @@ export function renderBest3Question(container, question, questionIndex){
     container.appendChild(optionsDiv)
 
 }
-```
+
