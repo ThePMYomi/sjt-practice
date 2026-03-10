@@ -9,6 +9,7 @@ export function renderBest3Question(container, question, questionIndex){
     const savedAnswer = answers[questionIndex] || []
 
 
+
     // =====================
     // SCENARIO
     // =====================
@@ -25,6 +26,7 @@ export function renderBest3Question(container, question, questionIndex){
     container.appendChild(scenario)
 
 
+
     // =====================
     // OPTIONS
     // =====================
@@ -34,11 +36,13 @@ export function renderBest3Question(container, question, questionIndex){
     optionsDiv.className = "best3-options"
 
 
+
     Object.entries(question.options).forEach(([key,value])=>{
 
         const label = document.createElement("label")
 
         label.className = "best3-option"
+
 
 
         const checkbox = document.createElement("input")
@@ -48,11 +52,13 @@ export function renderBest3Question(container, question, questionIndex){
         checkbox.value = key
 
 
+
         // Restore previous answers
         if(savedAnswer.includes(key)){
             checkbox.checked = true
             label.classList.add("selected-option")
         }
+
 
 
         checkbox.addEventListener("change",()=>{
@@ -71,10 +77,12 @@ export function renderBest3Question(container, question, questionIndex){
             }
 
 
+
             const answer =
                 selected.map(cb=>cb.value)
 
             saveAnswer(questionIndex,answer)
+
 
 
             // highlight selected
@@ -89,20 +97,17 @@ export function renderBest3Question(container, question, questionIndex){
         })
 
 
-        // safer way to add text (does not rebuild DOM)
+
         label.appendChild(checkbox)
 
-        const text = document.createElement("span")
-        text.innerHTML = `<strong>${key}</strong> — ${value}`
-        
-        label.appendChild(text)
+        label.innerHTML += `<strong>${key}</strong> — ${value}`
 
         optionsDiv.appendChild(label)
 
     })
 
 
+
     container.appendChild(optionsDiv)
 
 }
-
