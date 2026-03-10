@@ -90,10 +90,11 @@ export function renderBest3Question(container, question, questionIndex){
 
 
         // safer way to add text (does not rebuild DOM)
+        label.appendChild(checkbox)
+
         const text = document.createElement("span")
         text.innerHTML = `<strong>${key}</strong> — ${value}`
-
-        label.appendChild(checkbox)
+        
         label.appendChild(text)
 
         optionsDiv.appendChild(label)
@@ -104,3 +105,4 @@ export function renderBest3Question(container, question, questionIndex){
     container.appendChild(optionsDiv)
 
 }
+
