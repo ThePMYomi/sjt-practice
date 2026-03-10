@@ -53,13 +53,10 @@ export function renderBest3Question(container, question, questionIndex){
 
 
 
-        // Restore saved answers
+        // Restore previous answers
         if(savedAnswer.includes(key)){
-
             checkbox.checked = true
-
             label.classList.add("selected-option")
-
         }
 
 
@@ -88,7 +85,7 @@ export function renderBest3Question(container, question, questionIndex){
 
 
 
-            // visual highlight
+            // highlight selected
 
             optionsDiv.querySelectorAll(".best3-option")
             .forEach(opt=>opt.classList.remove("selected-option"))
@@ -103,17 +100,7 @@ export function renderBest3Question(container, question, questionIndex){
 
         label.appendChild(checkbox)
 
-
-
-        // IMPORTANT FIX (prevents DOM reset bug)
-
-        const text = document.createElement("span")
-
-        text.innerHTML = `<strong>${key}</strong> — ${value}`
-
-        label.appendChild(text)
-
-
+        label.innerHTML += `<strong>${key}</strong> — ${value}`
 
         optionsDiv.appendChild(label)
 
