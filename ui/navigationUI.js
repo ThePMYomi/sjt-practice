@@ -69,3 +69,4 @@ export function updateNavigation(currentIndex, totalQuestions){
     }
 
 }
+
