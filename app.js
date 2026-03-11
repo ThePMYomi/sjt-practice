@@ -13,6 +13,46 @@ import {
 import { showHistory } from "./ui/historyUI.js"
 import { generateWeakAreaPractice } from "./engine/examEngine.js"
 
+//==================
+// UPDATE COMPETENCY DROPDOWN
+//==================
+
+function updateCompetencyDropdown(){
+
+    const counts = getCompetencyCounts()
+
+    const select = document.getElementById("competency")
+
+    const options = select.querySelectorAll("option")
+
+    // Calculate total questions
+    const total =
+        Object.values(counts).reduce((a,b)=>a+b,0)
+
+    options.forEach(option=>{
+
+        const value = option.value
+
+        // Handle "All Competencies"
+        if(value === "all"){
+
+            option.textContent =
+                `All Competencies (${total})`
+
+            return
+        }
+
+        const count = counts[value] || 0
+
+        const label =
+            option.textContent.split("(")[0].trim()
+
+        option.textContent =
+            `${label} (${count})`
+
+    })
+
+}
 // =======================
 // INITIALISE APP
 // =======================
@@ -199,5 +239,6 @@ window.addEventListener("beforeunload", function (e) {
 })
     
 })
+
 
 
