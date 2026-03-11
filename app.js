@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("Loading question bank...")
 
     await loadQuestionBank()
+    updateCompetencyDropdown()
 
     console.log("App ready")
 
@@ -198,4 +199,5 @@ window.addEventListener("beforeunload", function (e) {
 })
     
 })
+
 
