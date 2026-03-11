@@ -81,8 +81,10 @@ function indexQuestions(){
         else if(q.difficulty === "medium") mediumQuestions.push(q)
         else if(q.difficulty === "hard") hardQuestions.push(q)
 
-        if(competencyIndex[q.competency]){
-            competencyIndex[q.competency].push(q)
+       const comp = q.competency?.toLowerCase().trim()
+
+        if(competencyIndex[comp]){
+            competencyIndex[comp].push(q)
         }
 
     })
@@ -134,7 +136,7 @@ export function generateCompetencyPractice(
 
     currentMode = mode || "exam"
 
-    let pool = competencyIndex[competency] || []
+    let pool = competencyIndex[competency.toLowerCase().trim()] || []
 
     buildQuestionSet(pool, numberOfQuestions, questionType)
 
@@ -905,6 +907,7 @@ export function generateWeakAreaPractice(){
     )
 
 }
+
 
 
 
