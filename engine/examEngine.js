@@ -26,13 +26,19 @@ let competencyIndex = {
 
     "patient-centred care": [],
     "professionalism": [],
+    "teamwork": [],
+    "communication": [],
     "team communication": [],
+    "professional integrity": [],
+    "safeguarding": [],
+    "professional development": [],
+    "complaint management": [],
+    "recognising limits of competence": [],
     "handling feedback": [],
     "coping with pressure": [],
     "clinical safety": [],
     "ethical decision making": [],
     "seeking supervision appropriately": []
-
 }
 
 let examQuestions = []
@@ -907,6 +913,7 @@ export function generateWeakAreaPractice(){
     )
 
 }
+
 
 
 
