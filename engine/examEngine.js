@@ -56,10 +56,10 @@ export async function loadQuestionBank(){
     questionBank = await response.json()
 
     indexQuestions()
-
+console.log("Questions loaded:", questionBank.length)
 }
 
-console.log("Questions loaded:", questionBank.length)
+
 
 // =======================
 // INDEX QUESTIONS
@@ -885,5 +885,6 @@ export function generateWeakAreaPractice(){
     )
 
 }
+
 
 
