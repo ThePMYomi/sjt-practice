@@ -790,7 +790,27 @@ export function practiceIncorrect(){
 
 }
 
+//==========================
+// COMPETENCY COUNTS
+//=======================
 
+export function getCompetencyCounts(){
+
+    const counts = {}
+
+    questionBank.forEach(q=>{
+
+        if(!counts[q.competency]){
+            counts[q.competency] = 0
+        }
+
+        counts[q.competency]++
+
+    })
+
+    return counts
+
+}
 
 // =======================
 // GETTERS
@@ -885,6 +905,7 @@ export function generateWeakAreaPractice(){
     )
 
 }
+
 
 
 
