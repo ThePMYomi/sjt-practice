@@ -7,7 +7,8 @@ import {
     nextQuestion,
     previousQuestion,
     submitExam,
-    practiceIncorrect
+    practiceIncorrect,
+    getCompetencyCounts
 } from "./engine/examEngine.js"
 import { showHistory } from "./ui/historyUI.js"
 import { generateWeakAreaPractice } from "./engine/examEngine.js"
@@ -197,3 +198,4 @@ window.addEventListener("beforeunload", function (e) {
 })
     
 })
+
