@@ -560,4 +560,18 @@ opacity:0.6;
 
 }
 
+.timer-question{
+
+font-weight:bold;
+font-size:18px;
+margin-bottom:4px;
+
+}
+
+.timer-time{
+
+font-size:22px;
+color:#2c7be5;
+
+}
 
