@@ -48,7 +48,7 @@ let currentQuestionIndex = 0
 
 let timerInterval = null
 let timeRemaining = 0
-
+let questionTimeLimit = 0
 
 
 // =======================
@@ -242,7 +242,14 @@ function startTimer(questionCount){
 
     if(timerInterval) clearInterval(timerInterval)
 
-    timeRemaining = Math.round(questionCount * 1.9 * 60)
+    // total exam time (same formula as before)
+    const totalTime = Math.round(questionCount * 1.9 * 60)
+
+    // divide equally per question
+    questionTimeLimit =
+        Math.floor(totalTime / questionCount)
+
+    timeRemaining = questionTimeLimit
 
     const timerDiv = document.getElementById("timer")
 
@@ -253,17 +260,68 @@ function startTimer(questionCount){
         const minutes = Math.floor(timeRemaining/60)
         const seconds = timeRemaining % 60
 
-        timerDiv.innerText =
-            minutes + ":" + (seconds < 10 ? "0"+seconds : seconds)
+        timerDiv.innerHTML = `
+        <div class="timer-question">
+        Question ${currentQuestionIndex + 1} of ${examQuestions.length}
+        </div>
+        <div class="timer-time">
+        Time remaining: ${minutes}:${seconds < 10 ? "0"+seconds : seconds}
+        </div>
+        `
 
         if(timeRemaining <= 0){
-            submitExam()
+
+            goToNextTimedQuestion()
+
         }
 
     },1000)
 
 }
 
+//=====================
+// UPDATE TIMER DISPLAY
+//======================
+    function updateTimerDisplay(){
+    
+        const timerDiv = document.getElementById("timer")
+    
+        const minutes = Math.floor(timeRemaining/60)
+        const seconds = timeRemaining % 60
+    
+        timerDiv.innerHTML = `
+        <div class="timer-question">
+        Question ${currentQuestionIndex + 1} of ${examQuestions.length}
+        </div>
+        <div class="timer-time">
+        Time remaining: ${minutes}:${seconds < 10 ? "0"+seconds : seconds}
+        </div>
+        `
+    }
+
+
+// ====================
+// AUTO-NEXT FUNCTION
+//====================
+
+function goToNextTimedQuestion(){
+
+    if(currentQuestionIndex < examQuestions.length - 1){
+
+        currentQuestionIndex++
+
+        timeRemaining = questionTimeLimit
+
+        renderCurrentQuestion()
+
+    }
+    else{
+
+        submitExam()
+
+    }
+
+}
 
 
 // =======================
@@ -279,7 +337,7 @@ export function renderCurrentQuestion(){
     const container = document.getElementById("quiz")
 
     container.innerHTML = ""
-
+    updateTimerDisplay()
 
 
     const header = document.createElement("div")
@@ -441,12 +499,13 @@ export function nextQuestion(){
 
         currentQuestionIndex++
 
+        timeRemaining = questionTimeLimit
+
         renderCurrentQuestion()
 
     }
 
 }
-
 
 
 export function previousQuestion(){
@@ -913,6 +972,7 @@ export function generateWeakAreaPractice(){
     )
 
 }
+
 
 
 
